@@ -1,0 +1,14 @@
+{
+  "version": "0.2.0",
+  "configurations": [
+    {
+      "type": "node",
+      "request": "launch",
+      "name": "ARC CLI",
+      "program": "${workspaceFolder}/bin/cli.mjs",
+      "args": ["init", "${workspaceFolder}/.tmp-vault"],
+      "preLaunchTask": "npm: build",
+      "console": "integratedTerminal"
+    }
+  ]
+}
