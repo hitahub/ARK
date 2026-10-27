@@ -1,5 +1,5 @@
 {
-  "name": "arc",
+  "name": "@hitahub/arc",
   "version": "1.0.0",
   "description": "Scaffold and verify an Atomic Rosetta Contextual Obsidian vault",
   "type": "module",

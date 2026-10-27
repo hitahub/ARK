@@ -18,13 +18,20 @@ pnpm test
 pnpm format:check
 ```
 
-After publishing the package, use `pnpm dlx arc@latest` without a global install:
+After publishing the package, use `npx` or `pnpm dlx` without a global install:
 
 ```bash
-pnpm dlx arc@latest init
-pnpm dlx arc@latest init ./MyNewVault
-pnpm dlx arc@latest verify ./MyNewVault
+npx @hitahub/arc init
+npx @hitahub/arc init ./MyNewVault
+npx @hitahub/arc verify ./MyNewVault
+
+pnpm dlx @hitahub/arc init
+pnpm dlx @hitahub/arc init ./MyNewVault
+pnpm dlx @hitahub/arc verify ./MyNewVault
 ```
+
+The npm package is scoped as `@hitahub/arc`; the installed executable remains `arc`.
+These commands require the package to be published and accessible to your npm account.
 
 With no path, `init` asks before scaffolding the current directory. Supplying a path skips the prompt. Initialization creates missing files and directories but never overwrites existing files; existing files are reported as preserved. Filesystem failures are reported and return a non-zero exit code. A failure can leave a partially scaffolded directory.
 

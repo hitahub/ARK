@@ -36,7 +36,7 @@ The primary command `arc init` will generate the ARC folder hierarchy and Markdo
 
 ## 💻 CLI Usage (local development and published package)
 
-For local development, build the CLI and invoke its wrapper directly. After publishing, users can run it without a global installation using `pnpm dlx`.
+For local development, build the CLI and invoke its wrapper directly. After publishing the scoped package `@hitahub/arc`, users can run it without a global installation using `npx` or `pnpm dlx`. The executable remains `arc`.
 
 1. **Build and initialize a local test vault:**
 
@@ -50,7 +50,8 @@ node bin/cli.mjs verify ./MyNewVault
 1. **Initialize in the current directory using the published package:**
 
 ```bash
-pnpm dlx arc@latest init
+npx @hitahub/arc init
+pnpm dlx @hitahub/arc init
 
 ```
 
@@ -58,7 +59,8 @@ pnpm dlx arc@latest init
 3. **Initialize a specific directory using the published package:**
 
 ```bash
-pnpm dlx arc@latest init ./MyNewVault
+npx @hitahub/arc init ./MyNewVault
+pnpm dlx @hitahub/arc init ./MyNewVault
 
 ```
 
@@ -66,8 +68,10 @@ pnpm dlx arc@latest init ./MyNewVault
 4. **Verify the current directory or a specific directory:**
 
 ```bash
-pnpm dlx arc@latest verify
-pnpm dlx arc@latest verify ./MyNewVault
+npx @hitahub/arc verify
+npx @hitahub/arc verify ./MyNewVault
+pnpm dlx @hitahub/arc verify
+pnpm dlx @hitahub/arc verify ./MyNewVault
 
 ```
 
@@ -273,7 +277,7 @@ To maintain visual clarity and cognitive distinction across the architecture lay
 * [x] Add CI to install with the frozen lockfile and run format check, tests, typecheck, and build.
 * [x] Run build, tests, and formatting checks.
 * [x] Smoke-test local CLI commands against temporary vaults and verify npm package contents.
-* [x] Document that `pnpm dlx arc@latest ...` requires a published package.
+* [x] Document that `npx @hitahub/arc ...` and `pnpm dlx @hitahub/arc ...` require the scoped package to be published and accessible from the configured registry.
 
 ---
 
@@ -301,7 +305,7 @@ Explore an ARC-aware context server as an alternative to generic filesystem MCP 
 
 Treating the knowledge base like a production codebase.
 
-* **`npx arc health`**: Scans the vault to report on orphaned notes, broken links, or ARC rule violations.
+* **`npx @hitahub/arc health`**: Scans the vault to report on orphaned notes, broken links, or ARC rule violations.
 * **Git Hook Integration**: Automatically installs via Husky to prevent committing code/notes if the vault violates ARC rules (e.g., preventing a push if subfolders exist in the Slipbox).
 
 ### 4. AI-Powered Semantic Auto-Linker
@@ -312,7 +316,7 @@ An offline background daemon running a local embedding model (via Ollama).
 
 ### 5. Lifecycle Automation (`arc archive`)
 
-* **`npx arc archive <Project-Name>`**: Automatically moves completed projects out of `200_Projects/` into cold storage, rewrites the YAML frontmatter to `status: archived`, and purges it from the active `Dashboard.md`.
+* **`npx @hitahub/arc archive <Project-Name>`**: Automatically moves completed projects out of `200_Projects/` into cold storage, rewrites the YAML frontmatter to `status: archived`, and purges it from the active `Dashboard.md`.
 
 ### 6. Seamless Web Publishing (`arc publish`)
 
