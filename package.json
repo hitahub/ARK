@@ -13,6 +13,7 @@
     "docs",
     "CONTRIBUTING.md",
     "CODE_OF_CONDUCT.md",
+    "SECURITY.md",
     "README.md"
   ],
   "bin": {

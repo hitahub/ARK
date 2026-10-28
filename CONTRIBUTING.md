@@ -4,6 +4,8 @@ Thank you for helping improve ARC CLI. This guide explains how to propose change
 
 All participants are expected to follow the [Code of Conduct](CODE_OF_CONDUCT.md).
 
+Please report security vulnerabilities using the process in [SECURITY.md](SECURITY.md), not through a public issue or pull request.
+
 ## Before you start
 
 - For a bug fix or a small documentation correction, you can open a pull request directly.
