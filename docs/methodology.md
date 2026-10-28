@@ -1,5 +1,9 @@
 # ARC methodology
 
+For a map of the vault layers and their connections, see
+[ARC vault architecture](architecture.md). For end-to-end examples, see
+[Vault workflows](vault-workflows.md).
+
 **Atomic Rosetta Contextual (ARC)** is a personal knowledge and execution framework intended to work with ordinary Markdown tools and, when explicitly configured, AI clients that can access local files. It combines context boundaries, connected atomic notes, and iterative project execution.
 
 ## ACCESS: actionable boundaries
@@ -22,10 +26,15 @@ ARC CLI scaffolds an example project layout, but it does not manage project life
 
 ## Layers work together
 
-1. Use Spaces for ongoing responsibilities without a fixed completion date.
-2. Use Projects for bounded outcomes and active phases.
-3. Capture reusable knowledge in atomic Slipbox notes and link notes across areas.
-4. Use the Atlas and Dashboard to orient around projects and next actions.
-5. Use Journal folders for time-ordered daily notes and meeting records.
+1. Capture rough ideas in the Atlas idea matrix when they are not ready to
+   become standalone notes.
+2. Use Spaces for ongoing responsibilities without a fixed completion date.
+3. Use Projects for bounded outcomes, active phases, and work-specific tasks.
+4. Capture reusable knowledge in atomic Slipbox notes and link notes across
+   areas.
+5. Use the Dashboard to orient around active projects and open work; Dataview
+   must be installed for its query blocks to render.
+6. Use Journal folders for time-ordered daily notes, meeting records, and
+   weekly reviews.
 
 ARC is a flexible convention rather than an access-control system. Customize the vault while retaining the flat Slipbox rule if you want `arc verify` to pass.

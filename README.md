@@ -29,8 +29,10 @@ Use `arc init` without a path to scaffold the current directory after confirming
 | [Security](SECURITY.md)                                  | How to report security vulnerabilities privately.                          |
 | [Getting started](docs/getting-started.md)               | Requirements, install and usage examples, CLI behavior, troubleshooting.   |
 | [ARC methodology](docs/methodology.md)                   | ACCESS, Zettelkasten, and iterative project execution.                     |
+| [Vault architecture](docs/architecture.md)               | ARC layers, information flow, metadata contract, and design principles.    |
 | [Vault structure](docs/vault-structure.md)               | Folder roles, scaffold tree, required baseline, and verification behavior. |
-| [Templates and metadata](docs/templates-and-metadata.md) | Generated notes, frontmatter fields, status values, and Dataview contract. |
+| [Vault workflows](docs/vault-workflows.md)               | Practical capture, project, journal, review, and customization workflows.  |
+| [Templates and metadata](docs/templates-and-metadata.md) | Generated notes, frontmatter fields, status values, and Dataview queries.  |
 | [Obsidian setup](docs/obsidian-setup.md)                 | Dataview, Templater, Graph View, and AI/filesystem access limitations.     |
 | [Development](docs/development.md)                       | Architecture, scripts, tests, build, and CI.                               |
 | [Releasing](docs/releasing.md)                           | Manual npm package release checklist.                                      |
