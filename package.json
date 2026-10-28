@@ -2,6 +2,7 @@
   "name": "@hitahub/arc",
   "version": "1.0.0",
   "description": "Scaffold and verify an Atomic Rosetta Contextual Obsidian vault",
+  "license": "MIT",
   "type": "module",
   "engines": {
     "node": ">=20"
@@ -10,6 +11,8 @@
     "bin",
     "dist",
     "docs",
+    "CONTRIBUTING.md",
+    "CODE_OF_CONDUCT.md",
     "README.md"
   ],
   "bin": {

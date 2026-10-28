@@ -1,0 +1,55 @@
+name: Bug report
+description: Report a reproducible problem with ARC CLI.
+title: '[Bug]: '
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Before submitting, search existing issues for a similar report.
+  - type: input
+    id: version
+    attributes:
+      label: ARC CLI version
+      description: Check with `npx @hitahub/arc --version` or `node bin/cli.mjs --version`.
+      placeholder: 1.0.0
+    validations:
+      required: true
+  - type: input
+    id: node-version
+    attributes:
+      label: Node.js version
+      description: Run `node --version`.
+      placeholder: v20.x
+    validations:
+      required: true
+  - type: textarea
+    id: environment
+    attributes:
+      label: Environment
+      description: Include operating system, package invocation, and relevant Obsidian/plugin versions.
+      placeholder: macOS, npx, Obsidian ...
+    validations:
+      required: false
+  - type: textarea
+    id: steps
+    attributes:
+      label: Steps to reproduce
+      description: Provide the smallest sequence of commands or actions that reproduces the problem.
+      placeholder: |
+        1. Run ...
+        2. Observe ...
+    validations:
+      required: true
+  - type: textarea
+    id: expected
+    attributes:
+      label: Expected behavior
+    validations:
+      required: true
+  - type: textarea
+    id: actual
+    attributes:
+      label: Actual behavior
+      description: Include relevant output, but remove secrets and private vault content.
+    validations:
+      required: true
