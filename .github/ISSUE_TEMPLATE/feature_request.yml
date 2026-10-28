@@ -1,0 +1,29 @@
+name: Feature request
+description: Suggest an improvement or new capability.
+title: '[Feature]: '
+body:
+  - type: markdown
+    attributes:
+      value: |
+        For larger changes, please discuss the problem and intended approach before opening an implementation pull request.
+  - type: textarea
+    id: problem
+    attributes:
+      label: Problem or use case
+      description: What user need or problem would this address?
+    validations:
+      required: true
+  - type: textarea
+    id: proposal
+    attributes:
+      label: Proposed solution
+      description: Describe the behavior you would like to see.
+    validations:
+      required: true
+  - type: textarea
+    id: alternatives
+    attributes:
+      label: Alternatives considered
+      description: Include workarounds or alternative approaches, if any.
+    validations:
+      required: false

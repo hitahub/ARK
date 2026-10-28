@@ -74,9 +74,9 @@ Run all tests with `pnpm test`.
 
 ## Build and package
 
-`npm pack --dry-run` runs the `prepack` build and reports the package contents without publishing. `package.json` publishes `bin/`, `dist/`, and `README.md`; the CLI binary name is `arc` and the npm package name is `@hitahub/arc`.
+`npm pack --dry-run` runs the `prepack` build and reports the package contents without publishing. `package.json` includes `bin/`, `dist/`, `docs/`, `README.md`, `CONTRIBUTING.md`, and `CODE_OF_CONDUCT.md`; npm also includes the package license file. The CLI binary name is `arc` and the npm package name is `@hitahub/arc`.
 
-To publish, first confirm npm organization permissions, registry configuration, and the intended release version. Publication is not performed by the build or pack commands.
+To publish, first confirm npm organization permissions, registry configuration, and the intended release version. Publication is not performed by the build or pack commands. See the [manual npm release guide](releasing.md).
 
 ## Continuous integration
 
