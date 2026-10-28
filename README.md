@@ -26,6 +26,7 @@ Use `arc init` without a path to scaffold the current directory after confirming
 | -------------------------------------------------------- | -------------------------------------------------------------------------- |
 | [Contributing](CONTRIBUTING.md)                          | Development setup, contribution workflow, and pull request guidance.       |
 | [Code of Conduct](CODE_OF_CONDUCT.md)                    | Community participation expectations.                                      |
+| [Security](SECURITY.md)                                  | How to report security vulnerabilities privately.                          |
 | [Getting started](docs/getting-started.md)               | Requirements, install and usage examples, CLI behavior, troubleshooting.   |
 | [ARC methodology](docs/methodology.md)                   | ACCESS, Zettelkasten, and iterative project execution.                     |
 | [Vault structure](docs/vault-structure.md)               | Folder roles, scaffold tree, required baseline, and verification behavior. |
