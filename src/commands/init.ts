@@ -1,8 +1,14 @@
 import { confirm } from '@inquirer/prompts';
+import fs from 'fs-extra';
 import path from 'node:path';
-import { ensureDirectories, writeFileIfMissing } from '../utils/fileSystem.js';
+import {
+  ensureDirectoryTracked,
+  hasErrorCode,
+  isMissingError,
+  writeFileIfMissing,
+} from '../utils/fileSystem.js';
 import { logger } from '../utils/logger.js';
-import { files } from '../templates/index.js';
+import { scaffoldFiles } from '../templates/index.js';
 
 const baseDirectories = [
   '000_Atlas',
@@ -22,12 +28,13 @@ export interface InitOptions {
   cwd?: string;
   confirmCurrentDirectory?: () => Promise<boolean>;
   now?: () => Date;
+  dryRun?: boolean;
 }
 
 export async function initializeVault(
   targetPath: string | undefined,
   options: InitOptions = {},
-): Promise<{ created: string[]; skipped: string[] }> {
+): Promise<{ created: string[]; skipped: string[]; dryRun?: boolean }> {
   const cwd = options.cwd ?? process.cwd();
   const target = path.resolve(cwd, targetPath ?? '.');
   // An explicit path is an affirmative target; only the implicit cwd needs confirmation.
@@ -51,21 +58,85 @@ export async function initializeVault(
   // Resolve the journal year once so the whole scaffold uses one consistent local date.
   const year = String((options.now ?? (() => new Date()))().getFullYear());
   const directories = [...baseDirectories, path.posix.join('400_Journal', year)];
-  await ensureDirectories(target, directories);
 
   const created: string[] = [];
   const skipped: string[] = [];
-  const outputFiles: Record<string, string> = {
-    ...files,
-    '100_Spaces/110_Career_Business/.gitkeep': '',
-    '100_Spaces/120_Creative_SideHustle/.gitkeep': '',
-    '100_Spaces/130_Personal/.gitkeep': '',
-    '200_Projects/.gitkeep': '',
-  };
+  const plannedDirectories = [
+    target,
+    ...directories.map((directory) => path.join(target, directory)),
+  ];
+  if (options.dryRun) {
+    for (const directory of plannedDirectories) {
+      const stats = await fs.stat(directory).catch((error: unknown) => {
+        if (isMissingError(error)) return undefined;
+        throw error;
+      });
+      if (stats && !stats.isDirectory()) {
+        throw new Error(`Not a directory: ${directory}`);
+      }
+    }
+    for (const relativePath of Object.keys(scaffoldFiles)) {
+      const absolutePath = path.join(target, relativePath);
+      const stats = await fs.lstat(absolutePath).catch((error: unknown) => {
+        if (isMissingError(error)) return undefined;
+        throw error;
+      });
+      if (stats && !stats.isFile() && !stats.isSymbolicLink()) {
+        throw new Error(`Not a file: ${absolutePath}`);
+      }
+      (stats ? skipped : created).push(relativePath);
+    }
+    logger.info(`Dry run for ${target}`);
+    for (const relativePath of created) logger.info(`Would create ${relativePath}`);
+    for (const relativePath of skipped) logger.info(`Would preserve ${relativePath}`);
+    return { created, skipped, dryRun: true };
+  }
 
-  for (const [relativePath, contents] of Object.entries(outputFiles)) {
-    const result = await writeFileIfMissing(target, relativePath, contents);
-    (result.written ? created : skipped).push(result.path);
+  const createdDirectories: string[] = [];
+  const createdFiles: Array<{ path: string; contents: string }> = [];
+  try {
+    for (const directory of plannedDirectories) {
+      await ensureDirectoryTracked(directory, createdDirectories);
+    }
+
+    for (const [relativePath, contents] of Object.entries(scaffoldFiles)) {
+      const result = await writeFileIfMissing(target, relativePath, contents);
+      (result.written ? created : skipped).push(result.path);
+      if (result.written) createdFiles.push({ path: result.path, contents });
+    }
+  } catch (error) {
+    const rollbackErrors: unknown[] = [];
+    for (const file of createdFiles.reverse()) {
+      try {
+        const absolutePath = path.join(target, file.path);
+        const stats = await fs.lstat(absolutePath);
+        if (stats.isFile() && (await fs.readFile(absolutePath, 'utf8')) === file.contents) {
+          await fs.unlink(absolutePath);
+        }
+      } catch (rollbackError) {
+        if (!isMissingError(rollbackError)) rollbackErrors.push(rollbackError);
+      }
+    }
+    for (const directory of createdDirectories.reverse()) {
+      try {
+        await fs.rmdir(directory);
+      } catch (rollbackError) {
+        if (
+          !isMissingError(rollbackError) &&
+          !hasErrorCode(rollbackError, 'ENOTEMPTY') &&
+          !hasErrorCode(rollbackError, 'EEXIST')
+        ) {
+          rollbackErrors.push(rollbackError);
+        }
+      }
+    }
+    if (rollbackErrors.length > 0) {
+      throw new AggregateError(
+        [error, ...rollbackErrors],
+        'Initialization failed and rollback was incomplete',
+      );
+    }
+    throw error;
   }
 
   for (const relativePath of created) {

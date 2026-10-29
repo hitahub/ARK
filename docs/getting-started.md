@@ -21,6 +21,10 @@ npx @hitahub/arc init ./MyNewVault
 # Verify the current directory or a specified vault.
 npx @hitahub/arc verify
 npx @hitahub/arc verify ./MyNewVault
+npx @hitahub/arc health ./MyNewVault
+npx @hitahub/arc update ./MyNewVault
+npx @hitahub/arc init ./PreviewVault --dry-run
+npx @hitahub/arc update ./MyNewVault --dry-run
 ```
 
 Equivalent commands using pnpm:
@@ -30,6 +34,8 @@ pnpm dlx @hitahub/arc init
 pnpm dlx @hitahub/arc init ./MyNewVault
 pnpm dlx @hitahub/arc verify
 pnpm dlx @hitahub/arc verify ./MyNewVault
+pnpm dlx @hitahub/arc health ./MyNewVault
+pnpm dlx @hitahub/arc update ./MyNewVault
 ```
 
 If installed globally, invoke the binary directly:
@@ -38,6 +44,8 @@ If installed globally, invoke the binary directly:
 npm install --global @hitahub/arc
 arc init ./MyNewVault
 arc verify ./MyNewVault
+arc health ./MyNewVault
+arc update ./MyNewVault
 ```
 
 ## Run from a checkout
@@ -49,6 +57,8 @@ pnpm install
 pnpm build
 node bin/cli.mjs init ./MyNewVault
 node bin/cli.mjs verify ./MyNewVault
+node bin/cli.mjs health ./MyNewVault
+node bin/cli.mjs update ./MyNewVault
 ```
 
 The package is not downloaded from the registry when using `node bin/cli.mjs`.
@@ -61,14 +71,23 @@ The package is not downloaded from the registry when using `node bin/cli.mjs`.
 - If `path` is supplied, the CLI creates that directory if necessary and does not prompt.
 - Missing directories and generated files are created. Existing files are preserved and reported; there is no overwrite/force mode.
 - A directory occupying a generated file path is an error.
-- An I/O error is surfaced and results in a non-zero process exit code. Initialization is not transactional, so an error may leave a partially created scaffold.
 - A local-calendar-year folder is created in `400_Journal/`.
+- An I/O error is surfaced and results in a non-zero process exit code. Newly created files that still contain generated content and empty directories are rolled back; existing or subsequently changed content is left intact.
+- `--dry-run` previews files without writing. The current-directory confirmation still applies when the path is omitted.
 
 ## `verify` behavior
 
 `arc verify [path]` defaults to the current directory. It checks the required directories and files listed in [Vault structure](vault-structure.md), and rejects directories directly inside `300_Slipbox/`.
 
 Additional user folders and files are allowed. The example project is scaffolded by `init`, but is not required for `verify` to pass. An invalid vault or a filesystem/command error exits non-zero.
+
+## `health` behavior
+
+`arc health [path]` reports unresolved local Markdown and Obsidian wikilinks, notes under the ARC content layers with no inbound links, and all structural findings from `verify`. External URLs, links inside code, template source files, and valid links to folders are ignored. It is a report-only check: it never changes the vault. Findings cause a non-zero exit status. Orphan detection is heuristic and does not validate headings, metadata fields, or Dataview query results.
+
+## `update` behavior
+
+`arc update [path]` previews scaffold files that would be added or replaced and asks for confirmation (default: no). Replaced files are backed up under `.arc-backups/<timestamp>/` before updating; identical files remain untouched and symlinked scaffold files are preserved. `--yes` accepts the displayed preview for non-interactive use, while `--dry-run` prints it without prompting or writing.
 
 ## Troubleshooting
 

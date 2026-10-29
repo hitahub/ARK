@@ -2,6 +2,8 @@ import { createRequire } from 'node:module';
 import { Command } from 'commander';
 import { initializeVault, type InitOptions } from './commands/init.js';
 import { reportVerification, verifyVault } from './commands/verify.js';
+import { inspectVaultHealth, reportHealth } from './commands/health.js';
+import { updateVault, type UpdateOptions } from './commands/update.js';
 import { logger } from './utils/logger.js';
 
 // Read the package version so the --version flag stays aligned with published metadata.
@@ -12,13 +14,18 @@ const { version } = require('../package.json') as { version: string };
 export interface CliDependencies {
   initialize?: typeof initializeVault;
   verify?: typeof verifyVault;
+  health?: typeof inspectVaultHealth;
+  update?: typeof updateVault;
   initOptions?: InitOptions;
+  updateOptions?: UpdateOptions;
 }
 
 export function createProgram(dependencies: CliDependencies = {}): Command {
   const program = new Command();
   const initialize = dependencies.initialize ?? initializeVault;
   const verify = dependencies.verify ?? verifyVault;
+  const health = dependencies.health ?? inspectVaultHealth;
+  const update = dependencies.update ?? updateVault;
 
   program
     .name('arc')
@@ -29,8 +36,12 @@ export function createProgram(dependencies: CliDependencies = {}): Command {
     .command('init')
     .description('Create the ARC vault structure')
     .argument('[path]', 'target vault directory')
-    .action(async (targetPath: string | undefined) => {
-      await initialize(targetPath, dependencies.initOptions);
+    .option('--dry-run', 'preview scaffold changes without writing files')
+    .action(async (targetPath: string | undefined, commandOptions: { dryRun?: boolean }) => {
+      const initOptions = commandOptions.dryRun
+        ? { ...dependencies.initOptions, dryRun: true }
+        : dependencies.initOptions;
+      await initialize(targetPath, initOptions);
     });
 
   program
@@ -43,6 +54,30 @@ export function createProgram(dependencies: CliDependencies = {}): Command {
       if (!result.valid) {
         process.exitCode = 1;
       }
+    });
+
+  program
+    .command('health')
+    .description('Report broken internal links, orphan notes, and structure issues')
+    .argument('[path]', 'vault directory to inspect', process.cwd())
+    .action(async (targetPath: string) => {
+      const result = await health(targetPath);
+      reportHealth(result, targetPath);
+      if (!result.healthy) process.exitCode = 1;
+    });
+
+  program
+    .command('update')
+    .description('Preview and safely update ARC scaffold files')
+    .argument('[path]', 'vault directory to update', process.cwd())
+    .option('--yes', 'apply the preview without prompting')
+    .option('--dry-run', 'preview scaffold changes without writing files')
+    .action(async (targetPath: string, commandOptions: { yes?: boolean; dryRun?: boolean }) => {
+      await update(targetPath, {
+        ...dependencies.updateOptions,
+        ...(commandOptions.yes ? { yes: true } : {}),
+        ...(commandOptions.dryRun ? { dryRun: true } : {}),
+      });
     });
 
   return program;

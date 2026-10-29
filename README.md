@@ -9,6 +9,8 @@ ARC CLI scaffolds and verifies an **Atomic Rosetta Contextual (ARC)** knowledge 
 ```bash
 npx @hitahub/arc init ./MyNewVault
 npx @hitahub/arc verify ./MyNewVault
+npx @hitahub/arc health ./MyNewVault
+npx @hitahub/arc update ./MyNewVault
 ```
 
 Or with pnpm:
@@ -16,6 +18,8 @@ Or with pnpm:
 ```bash
 pnpm dlx @hitahub/arc init ./MyNewVault
 pnpm dlx @hitahub/arc verify ./MyNewVault
+pnpm dlx @hitahub/arc health ./MyNewVault
+pnpm dlx @hitahub/arc update ./MyNewVault
 ```
 
 Use `arc init` without a path to scaffold the current directory after confirming. Initialization creates missing files and never overwrites existing files.
@@ -41,7 +45,7 @@ Use `arc init` without a path to scaffold the current directory after confirming
 
 ## Project status
 
-The current CLI provides `init` and `verify`. Obsidian plugin automation, MCP services, health checks, semantic linking, archive automation, and publishing integrations are future explorations, not current features.
+The CLI provides `init`, `verify`, report-only `health`, and confirmed `update` commands. Obsidian plugin automation, MCP services, semantic linking, archive automation, and publishing integrations remain future explorations.
 
 ## License
 

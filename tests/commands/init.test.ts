@@ -77,4 +77,37 @@ describe('initializeVault', () => {
       }),
     ).rejects.toHaveProperty('code');
   });
+
+  it('shows a dry-run preview without creating directories or files', async () => {
+    const parent = await createTemporaryDirectory();
+    const target = path.join(parent, 'preview');
+    vi.spyOn(console, 'log').mockImplementation(() => undefined);
+
+    const result = await initializeVault('./preview', {
+      cwd: parent,
+      dryRun: true,
+      now: () => new Date(2032, 0, 1),
+    });
+
+    expect(result.dryRun).toBe(true);
+    expect(result.created).toContain('000_Atlas/Dashboard.md');
+    expect(await fs.pathExists(target)).toBe(false);
+  });
+
+  it('rolls back files and empty directories created before an initialization error', async () => {
+    const parent = await createTemporaryDirectory();
+    const target = path.join(parent, 'vault');
+    await fs.ensureDir(path.join(target, '200_Projects/.gitkeep'));
+
+    await expect(
+      initializeVault('./vault', {
+        cwd: parent,
+        now: () => new Date(2032, 0, 1),
+      }),
+    ).rejects.toThrow();
+
+    expect(await fs.pathExists(path.join(target, '000_Atlas/Dashboard.md'))).toBe(false);
+    expect(await fs.pathExists(path.join(target, '999_Templates'))).toBe(false);
+    expect(await fs.pathExists(path.join(target, '200_Projects/.gitkeep'))).toBe(true);
+  });
 });
