@@ -1,0 +1,9 @@
+{
+  "id": "arc-obsidian-plugin",
+  "name": "ARC Vault Companion",
+  "version": "0.1.0",
+  "minAppVersion": "1.5.0",
+  "description": "Read-only ARC vault checks, explicit note creation, and unresolved wikilink diagnostics.",
+  "author": "HitaHub",
+  "isDesktopOnly": false
+}

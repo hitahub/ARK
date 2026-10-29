@@ -15,18 +15,21 @@ pnpm install
 
 ```text
 bin/cli.mjs             Executable entry; imports the built ESM bundle
-src/index.ts            Commander program, command registration, and error handling
-src/commands/init.ts    Vault path, confirmation, directories, and file creation
-src/commands/verify.ts  Required baseline and flat-Slipbox checks
-src/commands/health.ts  Internal links, orphan notes, and structure reporting
-src/commands/update.ts  Preview, confirmation, backups, and scaffold updates
-src/templates/          Markdown/Templater strings and vault-relative file registry
-src/utils/fileSystem.ts Directory creation and exclusive write-if-missing helper
-src/utils/logger.ts     Consistent styled CLI output
-tests/                  Vitest unit and integration tests
+src/cli/index.ts                  Commander program and error handling
+src/cli/commands/                 CLI command implementations
+src/cli/templates/                Markdown/Templater strings and scaffold registry
+src/cli/utils/                    Filesystem and logging helpers
+src/obsidian-plugin/               Obsidian entry point, templates, and diagnostics
+tests/cli/                         CLI unit and integration tests
+tests/obsidian-plugin/             Plugin logic unit tests
+scripts/build-obsidian-plugin.mjs  Produces files for local install/community release
 ```
 
-The package is ESM. TypeScript source imports use `.js` extensions for NodeNext resolution. `tsup` bundles `src/index.ts` for Node.js 20 into `dist/index.js`, which the executable wrapper loads.
+The root package is ESM. TypeScript source imports use `.js` extensions for
+NodeNext resolution. `tsup` bundles `src/cli/index.ts` for Node.js 20 into
+`dist/cli/index.js`, which the executable wrapper loads. The plugin is bundled
+separately as CommonJS with Obsidian externalized; its manifest, bundle, and
+stylesheet are written to `dist/obsidian-plugin/`.
 
 ### Initialization flow
 
@@ -46,15 +49,16 @@ Verification checks the required directory/file baseline and checks direct entri
 
 ## Useful commands
 
-| Command             | Purpose                                            |
-| ------------------- | -------------------------------------------------- |
-| `pnpm build`        | Build `dist/index.js`.                             |
-| `pnpm dev`          | Run tsup in watch mode.                            |
-| `pnpm test`         | Run Vitest once.                                   |
-| `pnpm test:watch`   | Run Vitest in watch mode.                          |
-| `pnpm typecheck`    | Run `tsc --noEmit`.                                |
-| `pnpm format:check` | Check Prettier formatting without modifying files. |
-| `pnpm format`       | Format project files with Prettier.                |
+| Command             | Purpose                                                        |
+| ------------------- | -------------------------------------------------------------- |
+| `pnpm build`        | Build `dist/cli/index.js`.                                     |
+| `pnpm build:plugin` | Build community-plugin-ready files in `dist/obsidian-plugin/`. |
+| `pnpm dev`          | Run tsup in watch mode.                                        |
+| `pnpm test`         | Run Vitest once.                                               |
+| `pnpm test:watch`   | Run Vitest in watch mode.                                      |
+| `pnpm typecheck`    | Type-check CLI and plugin sources.                             |
+| `pnpm format:check` | Check Prettier formatting without modifying files.             |
+| `pnpm format`       | Format project files with Prettier.                            |
 
 For a local command smoke test:
 
@@ -88,7 +92,9 @@ To publish, first confirm npm organization permissions, registry configuration, 
 
 ## Continuous integration
 
-The GitHub Actions workflow in `.github/workflows/ci.yml` uses Node.js 20 and pnpm, installs from the frozen lockfile, then runs formatting checks, tests, typecheck, and build.
+The GitHub Actions workflow in `.github/workflows/ci.yml` uses Node.js 20 and
+pnpm, installs from the frozen lockfile, then runs formatting checks, tests,
+typecheck, and both CLI and plugin builds.
 
 ## Code and documentation guidance
 

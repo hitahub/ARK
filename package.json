@@ -26,6 +26,7 @@
     "test": "vitest run",
     "test:watch": "vitest",
     "typecheck": "tsc --noEmit",
+    "build:plugin": "node scripts/build-obsidian-plugin.mjs",
     "format": "prettier --write .",
     "format:check": "prettier --check ."
   },
@@ -38,6 +39,8 @@
   "devDependencies": {
     "@types/fs-extra": "^11.0.4",
     "@types/node": "^22.19.0",
+    "esbuild": "^0.25.0",
+    "obsidian": "^1.8.7",
     "prettier": "^3.6.2",
     "tsup": "^8.5.0",
     "typescript": "^5.9.3",
