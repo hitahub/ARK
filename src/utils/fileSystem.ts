@@ -7,12 +7,26 @@ export interface WriteResult {
   written: boolean;
 }
 
+/**
+ * Ensure each requested directory path joined to a root directory exists.
+ *
+ * @param root Base directory for relative directory paths.
+ * @param directories Directory paths joined to `root`.
+ */
 export async function ensureDirectories(root: string, directories: string[]): Promise<void> {
   for (const directory of directories) {
     await fs.ensureDir(path.join(root, directory));
   }
 }
 
+/**
+ * Create a directory and its missing parents while recording only directories created here.
+ *
+ * Existing directories are left intact; a non-directory at any required path is an error.
+ *
+ * @param directory Absolute or relative path to ensure.
+ * @param createdDirectories Array that receives the absolute paths created by this call.
+ */
 export async function ensureDirectoryTracked(
   directory: string,
   createdDirectories: string[],
@@ -49,6 +63,17 @@ export async function ensureDirectoryTracked(
   }
 }
 
+/**
+ * Write a file only if its path does not already exist.
+ *
+ * Existing files and symlinks are preserved; an existing directory at the file path is an error.
+ *
+ * @param root Base directory joined with the file path.
+ * @param relativePath File path joined with `root`.
+ * @param contents UTF-8 content to write.
+ * @returns The relative path and whether this call created the file.
+ * @throws If the write fails for a reason other than an existing file or symlink.
+ */
 export async function writeFileIfMissing(
   root: string,
   relativePath: string,
@@ -73,6 +98,14 @@ export async function writeFileIfMissing(
   }
 }
 
+/**
+ * Replace a file atomically by writing a unique sibling temporary file and renaming it.
+ *
+ * @param filePath File to replace.
+ * @param contents UTF-8 replacement content.
+ * @param mode Optional filesystem mode for the temporary file.
+ * @throws If writing, renaming, or temporary-file cleanup fails.
+ */
 export async function writeFileAtomically(
   filePath: string,
   contents: string,
@@ -103,10 +136,23 @@ function isAlreadyExistsError(error: unknown): boolean {
   );
 }
 
+/**
+ * Check whether an error represents a missing filesystem path (`ENOENT`).
+ *
+ * @param error Value to inspect.
+ * @returns `true` when the error has the `ENOENT` code.
+ */
 export function isMissingError(error: unknown): boolean {
   return hasErrorCode(error, 'ENOENT');
 }
 
+/**
+ * Check whether an error carries a specific filesystem error code.
+ *
+ * @param error Value to inspect.
+ * @param code Expected error code.
+ * @returns `true` when the error has the requested code.
+ */
 export function hasErrorCode(error: unknown, code: string): boolean {
   return (
     typeof error === 'object' &&
