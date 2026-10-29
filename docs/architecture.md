@@ -91,12 +91,15 @@ fields, status vocabularies, and query blocks.
 `arc init` creates the standard directories, starter templates and index
 Markdown, an example project layout, `.gitkeep` markers where needed, a journal
 directory for the current local year, and a best-effort `.claudeignore`.
-Initialization creates missing files and preserves existing ones.
-
+Initialization creates missing files, preserves existing ones, supports
+`--dry-run`, and rolls back its own changes on failure.
 `arc verify` checks for the required baseline directories and files, and
 enforces only one content convention: no directory directly inside
-`300_Slipbox/`. It does not check note contents, frontmatter, links, Dataview
-results, optional example projects, or Obsidian plugin settings. See
+`300_Slipbox/`. `arc health` additionally reports unresolved local links,
+unreferenced notes, and verification findings without modifying the vault.
+Neither command validates Dataview results or Obsidian plugin settings.
+`arc update` previews scaffold changes and, after confirmation, backs up
+replaced files before updating them. See
 [Vault structure](vault-structure.md#what-verification-requires) for the exact
 requirements.
 

@@ -24,3 +24,11 @@ export const files: Record<string, string> = {
   '999_Templates/TPL_Weekly_Review.md': weeklyReview,
   '.claudeignore': ignore,
 };
+
+export const scaffoldFiles: Record<string, string> = {
+  ...files,
+  '100_Spaces/110_Career_Business/.gitkeep': '',
+  '100_Spaces/120_Creative_SideHustle/.gitkeep': '',
+  '100_Spaces/130_Personal/.gitkeep': '',
+  '200_Projects/.gitkeep': '',
+};
