@@ -1,6 +1,6 @@
 # ARC CLI
 
-ARC CLI scaffolds and verifies an **Atomic Rosetta Contextual (ARC)** knowledge vault. It creates an Obsidian-friendly folder structure, Markdown dashboards, and starter templates while preserving existing files.
+ARC CLI scaffolds, verifies, inspects, and safely updates an **Atomic Rosetta Contextual (ARC)** knowledge vault. It creates an Obsidian-friendly folder structure, Markdown dashboards, and starter templates while preserving existing files.
 
 > The npm package is named `@hitahub/arc`; the executable is named `arc`. The `npx` and `pnpm dlx` commands below require the package to be published and accessible from your configured registry.
 
@@ -23,6 +23,10 @@ pnpm dlx @hitahub/arc update ./MyNewVault
 ```
 
 Use `arc init` without a path to scaffold the current directory after confirming. Initialization creates missing files and never overwrites existing files.
+
+`init` and `update` support `--dry-run` to preview changes. `update --yes` applies
+the preview without prompting; changed scaffold files are backed up under
+`.arc-backups/` before replacement.
 
 ## Documentation
 

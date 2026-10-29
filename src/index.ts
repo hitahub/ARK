@@ -20,6 +20,12 @@ export interface CliDependencies {
   updateOptions?: UpdateOptions;
 }
 
+/**
+ * Create the ARC command tree, optionally replacing command implementations for tests.
+ *
+ * @param dependencies Implementations and options injected into registered commands.
+ * @returns A Commander program configured with `init`, `verify`, `health`, and `update`.
+ */
 export function createProgram(dependencies: CliDependencies = {}): Command {
   const program = new Command();
   const initialize = dependencies.initialize ?? initializeVault;
@@ -83,6 +89,12 @@ export function createProgram(dependencies: CliDependencies = {}): Command {
   return program;
 }
 
+/**
+ * Parse and run the ARC CLI, reporting command failures and setting a non-zero exit code.
+ *
+ * @param argv Process-style argument vector, including the executable and script names.
+ * @param dependencies Optional command implementations and options for embedding or tests.
+ */
 export async function runCli(
   argv = process.argv,
   dependencies: CliDependencies = {},

@@ -31,6 +31,18 @@ export interface InitOptions {
   dryRun?: boolean;
 }
 
+/**
+ * Create the ARC scaffold without replacing existing files.
+ *
+ * When `targetPath` is omitted, the current directory is used only after confirmation.
+ * A dry run validates target path types and reports the files that would be created or kept.
+ *
+ * @param targetPath Vault directory, resolved relative to `options.cwd` or the process cwd.
+ * @param options Prompts, clock, working directory, and dry-run configuration.
+ * @returns Paths created and preserved; `dryRun` is present for preview results.
+ * @throws If filesystem access or scaffold creation fails. A failed write is rolled back
+ * where safe; incomplete rollback is reported as an `AggregateError`.
+ */
 export async function initializeVault(
   targetPath: string | undefined,
   options: InitOptions = {},

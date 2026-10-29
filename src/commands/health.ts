@@ -18,6 +18,16 @@ interface Link {
   wikiLink: boolean;
 }
 
+/**
+ * Report broken local links, likely orphan notes, and structural verification findings.
+ *
+ * The link and orphan checks are intentionally heuristic: they do not parse full Markdown
+ * syntax, headings, frontmatter, or plugin query results.
+ *
+ * @param targetPath Vault directory to inspect; defaults to the current working directory.
+ * @returns Health status and findings in the vault.
+ * @throws If the vault or its files cannot be read.
+ */
 export async function inspectVaultHealth(targetPath = process.cwd()): Promise<HealthResult> {
   const root = path.resolve(targetPath);
   const stats = await fs.stat(root);
@@ -54,6 +64,7 @@ export async function inspectVaultHealth(targetPath = process.cwd()): Promise<He
     }
   }
 
+  // Exclude the two generated navigation notes so an otherwise empty scaffold is not noisy.
   const coreNotes = new Set(['000_atlas/dashboard.md', '000_atlas/moc_idea_matrix.md']);
   for (const file of files) {
     const normalized = normalize(file);
@@ -101,6 +112,7 @@ async function listDirectories(root: string, relative = ''): Promise<string[]> {
 }
 
 function extractLinks(contents: string): Link[] {
+  // A lightweight regex scan keeps this check dependency-free; it is not a full Markdown parser.
   const links: Link[] = [];
   for (const match of contents.matchAll(/\[\[([^\]]+)\]\]/g)) {
     const target = match[1].split('|', 1)[0].trim();
@@ -140,6 +152,7 @@ function resolveLink(
   }
 
   if (link.wikiLink) {
+    // Obsidian links may be relative, vault-rooted, or resolved by a unique note basename.
     const notePath = normalize(
       target.startsWith('/')
         ? target.replace(/^\/+/, '')
@@ -157,6 +170,7 @@ function resolveLink(
     return matches?.length === 1 ? normalize(matches[0]) : undefined;
   }
 
+  // Markdown links are path-based; unlike wikilinks, they are not basename-searched.
   const relativeTarget = normalize(
     target.startsWith('/')
       ? target.replace(/^\/+/, '')
@@ -175,9 +189,16 @@ function normalize(value: string): string {
 }
 
 function stripCode(contents: string): string {
+  // Avoid reporting link-like text in fenced or inline code as real vault links.
   return contents.replace(/```[\s\S]*?```|~~~[\s\S]*?~~~/g, '').replace(/`[^`]*`/g, '');
 }
 
+/**
+ * Print a health result to stdout or stderr.
+ *
+ * @param result Result returned by {@link inspectVaultHealth}.
+ * @param targetPath Vault directory that was inspected.
+ */
 export function reportHealth(result: HealthResult, targetPath: string): void {
   if (result.healthy) {
     console.log(`ARC vault health check passed: ${path.resolve(targetPath)}`);

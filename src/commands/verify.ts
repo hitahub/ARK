@@ -31,6 +31,13 @@ export interface VerificationResult {
   issues: string[];
 }
 
+/**
+ * Check the required ARC directories and files and enforce a flat Slipbox.
+ *
+ * @param targetPath Vault directory to inspect; defaults to the current working directory.
+ * @returns Whether the baseline is valid and any structural findings.
+ * @throws If the filesystem cannot be inspected.
+ */
 export async function verifyVault(targetPath = process.cwd()): Promise<VerificationResult> {
   const target = path.resolve(targetPath);
   const issues: string[] = [];
@@ -67,6 +74,12 @@ export async function verifyVault(targetPath = process.cwd()): Promise<Verificat
   return { valid: issues.length === 0, issues };
 }
 
+/**
+ * Print a verification result to stdout or stderr.
+ *
+ * @param result Result returned by {@link verifyVault}.
+ * @param targetPath Vault directory that was checked.
+ */
 export function reportVerification(result: VerificationResult, targetPath: string): void {
   if (result.valid) {
     console.log(`ARC structure verified: ${path.resolve(targetPath)}`);

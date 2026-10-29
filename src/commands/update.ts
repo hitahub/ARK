@@ -33,6 +33,18 @@ export interface UpdateResult {
   backupDirectory?: string;
 }
 
+/**
+ * Preview and optionally apply updates to generated ARC scaffold files.
+ *
+ * Changed files are backed up before replacement; additions use exclusive creation,
+ * and a failed operation rolls back changes where it is safe to do so.
+ *
+ * @param targetPath Vault directory, resolved relative to `options.cwd` or the process cwd.
+ * @param options Confirmation, clock, working directory, and non-interactive/dry-run settings.
+ * @returns Updated, created, and unchanged paths, plus cancellation, preview, or backup details.
+ * @throws If the target or scaffold paths are unsafe, filesystem access fails, or an update
+ * cannot be applied or rolled back safely.
+ */
 export async function updateVault(
   targetPath: string | undefined,
   options: UpdateOptions = {},
@@ -245,6 +257,7 @@ export async function updateVault(
 }
 
 async function findSymlinkParent(root: string, relativePath: string): Promise<string | undefined> {
+  // Do not follow a symlink while creating scaffold files or backups beneath the vault root.
   const parts = path.posix.dirname(relativePath).split('/').filter(Boolean);
   let current = root;
   for (const part of parts) {
