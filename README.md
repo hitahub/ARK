@@ -37,6 +37,7 @@ Use `arc init` without a path to scaffold the current directory after confirming
 | [Development](docs/development.md)                       | Architecture, scripts, tests, build, and CI.                               |
 | [Releasing](docs/releasing.md)                           | Manual npm package release checklist.                                      |
 | [Roadmap](docs/roadmap.md)                               | Exploratory ideas that are not implemented in the current CLI.             |
+| [Project plan](docs/plans/00.plan.md)                    | Current project plan and vault architecture specification.                 |
 
 ## Project status
 
