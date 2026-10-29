@@ -1,5 +1,5 @@
-import { createRequire } from 'node:module';
 import { Command } from 'commander';
+import packageInfo from '../../package.json' with { type: 'json' };
 import { initializeVault, type InitOptions } from './commands/init.js';
 import { reportVerification, verifyVault } from './commands/verify.js';
 import { inspectVaultHealth, reportHealth } from './commands/health.js';
@@ -7,8 +7,7 @@ import { updateVault, type UpdateOptions } from './commands/update.js';
 import { logger } from './utils/logger.js';
 
 // Read the package version so the --version flag stays aligned with published metadata.
-const require = createRequire(import.meta.url);
-const { version } = require('../package.json') as { version: string };
+const { version } = packageInfo;
 
 // Injectable command dependencies keep CLI routing testable without filesystem side effects.
 export interface CliDependencies {

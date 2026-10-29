@@ -1,5 +1,5 @@
 import { afterEach, describe, expect, it, vi } from 'vitest';
-import { createProgram } from '../src/index.js';
+import { createProgram } from '../../src/cli/index.js';
 
 describe('CLI routing', () => {
   afterEach(() => {

@@ -2,7 +2,7 @@ import fs from 'fs-extra';
 import os from 'node:os';
 import path from 'node:path';
 import { afterEach, describe, expect, it, vi } from 'vitest';
-import { initializeVault } from '../../src/commands/init.js';
+import { initializeVault } from '../../../src/cli/commands/init.js';
 
 const temporaryDirectories: string[] = [];
 

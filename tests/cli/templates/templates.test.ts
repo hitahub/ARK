@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { files } from '../../src/templates/index.js';
+import { files } from '../../../src/cli/templates/index.js';
 
 describe('generated templates', () => {
   it('uses valid-looking YAML frontmatter in all Templater templates', () => {

@@ -1,17 +1,24 @@
 # Roadmap (exploratory)
 
-Everything on this page is a **future idea**, not functionality currently implemented by ARC CLI. The current CLI supports only `init` and `verify`. Each direction needs feasibility, security, and requirements review before implementation commitments are made.
+The CLI currently supports `init`, `verify`, `health`, and `update`. Roadmap items
+below distinguish available repository capabilities from future ideas. Each
+future direction needs feasibility, security, and requirements review before
+implementation commitments are made.
 
 ## 1. ARC Obsidian plugin
 
-Explore a native Obsidian plugin that could complement or replace parts of the external template workflow:
+An in-repository companion plugin is available under
+`src/obsidian-plugin/`. Build it with `pnpm build:plugin`; this generates
+community-plugin-ready files in `dist/obsidian-plugin/` without publishing them. See the
+[plugin guide](obsidian-plugin.md) for local installation instructions. It
+provides a read-only Slipbox structure warning, explicit ARC note creation, and
+unresolved-wikilink diagnostics for the active note.
 
-- Slipbox warnings or enforcement, after verifying the supported APIs and how external filesystem changes are handled.
-- Native note injection based on the destination folder, after validating Obsidian file-creation hooks.
-- Editor diagnostics for isolated or unclear wikilinks, preferably with opt-in correction.
-- Optional synchronization of task context to local AI clients, with explicit transport, consent, authentication, and lifecycle requirements.
-
-These are feasibility questions; no plugin currently ships in this repository.
+The plugin does not prevent or automatically repair filesystem changes, modify
+existing notes, or synchronize task context with AI clients. AI-client sync
+remains deferred until transport, consent, authentication, and lifecycle
+requirements are defined. The repository package is not yet published through
+the Obsidian community plugin directory.
 
 ## 2. ARC-aware MCP server
 

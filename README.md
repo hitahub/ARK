@@ -42,6 +42,7 @@ the preview without prompting; changed scaffold files are backed up under
 | [Vault workflows](docs/vault-workflows.md)               | Practical capture, project, journal, review, and customization workflows.  |
 | [Templates and metadata](docs/templates-and-metadata.md) | Generated notes, frontmatter fields, status values, and Dataview queries.  |
 | [Obsidian setup](docs/obsidian-setup.md)                 | Dataview, Templater, Graph View, and AI/filesystem access limitations.     |
+| [ARC Obsidian plugin](docs/obsidian-plugin.md)           | Optional plugin build, local installation, and supported features.         |
 | [Development](docs/development.md)                       | Architecture, scripts, tests, build, and CI.                               |
 | [Releasing](docs/releasing.md)                           | Manual npm package release checklist.                                      |
 | [Roadmap](docs/roadmap.md)                               | Exploratory ideas that are not implemented in the current CLI.             |
@@ -49,7 +50,10 @@ the preview without prompting; changed scaffold files are backed up under
 
 ## Project status
 
-The CLI provides `init`, `verify`, report-only `health`, and confirmed `update` commands. Obsidian plugin automation, MCP services, semantic linking, archive automation, and publishing integrations remain future explorations.
+The CLI provides `init`, `verify`, report-only `health`, and confirmed `update`
+commands. An optional ARC Obsidian companion is available as source in
+`src/obsidian-plugin/`; MCP services, semantic linking, archive automation,
+and publishing integrations remain future explorations.
 
 ## License
 

@@ -1,5 +1,2 @@
-packages:
-  - .
-
 allowBuilds:
   esbuild: true
