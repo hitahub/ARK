@@ -42,12 +42,23 @@ export function createProgram(dependencies: CliDependencies = {}): Command {
     .description('Create the ARC vault structure')
     .argument('[path]', 'target vault directory')
     .option('--dry-run', 'preview scaffold changes without writing files')
-    .action(async (targetPath: string | undefined, commandOptions: { dryRun?: boolean }) => {
-      const initOptions = commandOptions.dryRun
-        ? { ...dependencies.initOptions, dryRun: true }
-        : dependencies.initOptions;
-      await initialize(targetPath, initOptions);
-    });
+    .option('--no-plugin', 'skip installing the ARC Obsidian plugin')
+    .action(
+      async (
+        targetPath: string | undefined,
+        commandOptions: { dryRun?: boolean; plugin?: boolean },
+      ) => {
+        const initOptions =
+          commandOptions.dryRun || commandOptions.plugin === false
+            ? {
+                ...dependencies.initOptions,
+                ...(commandOptions.dryRun ? { dryRun: true } : {}),
+                ...(commandOptions.plugin === false ? { installPlugin: false } : {}),
+              }
+            : dependencies.initOptions;
+        await initialize(targetPath, initOptions);
+      },
+    );
 
   program
     .command('verify')

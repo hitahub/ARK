@@ -28,6 +28,15 @@ describe('CLI routing', () => {
     expect(initialize).toHaveBeenCalledWith('./vault', { cwd: '/vault-parent', dryRun: true });
   });
 
+  it('routes init with plugin installation disabled', async () => {
+    const initialize = vi.fn().mockResolvedValue({ created: [], skipped: [] });
+    const program = createProgram({ initialize }).exitOverride();
+
+    await program.parseAsync(['node', 'arc', 'init', './vault', '--no-plugin']);
+
+    expect(initialize).toHaveBeenCalledWith('./vault', { installPlugin: false });
+  });
+
   it('routes verify and sets failure status for invalid vaults', async () => {
     const verify = vi.fn().mockResolvedValue({
       valid: false,

@@ -1,6 +1,8 @@
 # Obsidian setup
 
-ARC CLI creates Markdown files and query blocks; it does not configure the Obsidian application or install community plugins.
+ARC CLI creates Markdown files and query blocks and installs the ARC Vault
+Companion plugin files by default. It does not configure Obsidian, enable that
+plugin, or install third-party plugins such as Dataview and Templater.
 
 ## Dataview
 

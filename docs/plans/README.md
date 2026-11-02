@@ -1,0 +1,21 @@
+# Project plans
+
+Plan files use this naming convention:
+
+```text
+<NN>.<lowercase-kebab-case-topic>.plan.md
+```
+
+- `NN` is a unique, zero-padded, two-digit sequence number.
+- The topic describes the plan in lowercase kebab case.
+- Keep the sequence number when a plan is completed; do not renumber later plans.
+- Use the next available number for a new plan.
+
+## Plans
+
+| File                                                                                                                 | Purpose                                                                              |
+| -------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------ |
+| [00.arc-cli-foundation.plan.md](./00.arc-cli-foundation.plan.md)                                                     | Original CLI scope and architecture.                                                 |
+| [01.arc-obsidian-plugin.plan.md](./01.arc-obsidian-plugin.plan.md)                                                   | ARC Obsidian companion implementation.                                               |
+| [02.recent-changes-review.plan.md](./02.recent-changes-review.plan.md)                                               | Review of the plugin introduction changes.                                           |
+| [03.technical-review-roadmap-plugin-installation.plan.md](./03.technical-review-roadmap-plugin-installation.plan.md) | Current technical review, implementation roadmap, and automatic plugin installation. |

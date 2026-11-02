@@ -23,7 +23,11 @@ describe('inspectVaultHealth', () => {
     const parent = await createTemporaryDirectory();
     const target = path.join(parent, 'vault');
     vi.spyOn(console, 'log').mockImplementation(() => undefined);
-    await initializeVault('./vault', { cwd: parent, now: () => new Date(2032, 0, 1) });
+    await initializeVault('./vault', {
+      cwd: parent,
+      now: () => new Date(2032, 0, 1),
+      installPlugin: false,
+    });
     await fs.writeFile(
       path.join(target, '300_Slipbox/Source.md'),
       '[[Target Note|the target]] and [[Missing Note]]',
@@ -63,7 +67,11 @@ describe('inspectVaultHealth', () => {
     const parent = await createTemporaryDirectory();
     const target = path.join(parent, 'vault');
     vi.spyOn(console, 'log').mockImplementation(() => undefined);
-    await initializeVault('./vault', { cwd: parent, now: () => new Date(2032, 0, 1) });
+    await initializeVault('./vault', {
+      cwd: parent,
+      now: () => new Date(2032, 0, 1),
+      installPlugin: false,
+    });
     await fs.writeFile(
       path.join(target, '300_Slipbox/Source.md'),
       '[external](https://example.com) `[[not a link]]` [[Nested Note]]',

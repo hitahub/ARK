@@ -27,19 +27,22 @@ scripts/build-obsidian-plugin.mjs  Produces files for local install/community re
 
 The root package is ESM. TypeScript source imports use `.js` extensions for
 NodeNext resolution. `tsup` bundles `src/cli/index.ts` for Node.js 20 into
-`dist/cli/index.js`, which the executable wrapper loads. The plugin is bundled
-separately as CommonJS with Obsidian externalized; its manifest, bundle, and
-stylesheet are written to `dist/obsidian-plugin/`.
+`dist/cli/index.js`, which the executable wrapper loads. `pnpm build` also
+builds the plugin as CommonJS with Obsidian externalized; its manifest, bundle,
+and stylesheet are written to `dist/obsidian-plugin/`. These files are included
+in the npm package and copied by `arc init` into the vault unless `--no-plugin`
+is specified.
 
 ### Initialization flow
 
 1. Resolve the requested target path against the current working directory.
 2. If no path was supplied, ask for confirmation; a declined prompt exits without creating the scaffold.
-3. Create the standard directories and the current local calendar year's journal folder.
-4. Write the registered scaffold files and `.gitkeep` markers only when missing.
-5. Report created and preserved files.
+3. Load the packaged plugin assets unless plugin installation was disabled.
+4. Create the standard directories and the current local calendar year's journal folder.
+5. Write the registered scaffold and plugin files only when missing.
+6. Report created and preserved files.
 
-Writes use exclusive-create semantics to prevent replacing pre-existing content, including during concurrent initialization attempts. On failure, initialization removes only files it created that still contain the generated content, then removes only empty directories it created. Rollback failures are surfaced alongside the original error. `--dry-run` previews planned file changes without writing.
+Writes use exclusive-create semantics to prevent replacing pre-existing content, including during concurrent initialization attempts. Plugin installation rejects symlinked parent paths to avoid writing outside the vault. On failure, initialization removes only files it created that still contain the generated content, then removes only empty directories it created. Rollback failures are surfaced alongside the original error. `--dry-run` previews planned file changes without writing.
 
 ### Verification flow
 
@@ -51,7 +54,7 @@ Verification checks the required directory/file baseline and checks direct entri
 
 | Command             | Purpose                                                        |
 | ------------------- | -------------------------------------------------------------- |
-| `pnpm build`        | Build `dist/cli/index.js`.                                     |
+| `pnpm build`        | Build the CLI and plugin into `dist/`.                         |
 | `pnpm build:plugin` | Build community-plugin-ready files in `dist/obsidian-plugin/`. |
 | `pnpm dev`          | Run tsup in watch mode.                                        |
 | `pnpm test`         | Run Vitest once.                                               |
@@ -81,6 +84,7 @@ Tests use Vitest and run against temporary directories. The current suite covers
 - verify baseline failures, allowed user content, flat Slipbox enforcement, and directory symlinks;
 - health findings for broken links, orphans, and structural issues;
 - update confirmation, backups, and symlink preservation.
+- plugin installation by default, opt-out, dry-run, collision preservation, and symlink safety.
 
 Run all tests with `pnpm test`.
 
