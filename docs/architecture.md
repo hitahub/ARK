@@ -90,7 +90,9 @@ fields, status vocabularies, and query blocks.
 
 `arc init` creates the standard directories, starter templates and index
 Markdown, an example project layout, `.gitkeep` markers where needed, a journal
-directory for the current local year, and a best-effort `.claudeignore`.
+directory for the current local year, a best-effort `.claudeignore`, and the
+ARC Vault Companion plugin files under `.obsidian/plugins/`. Use `--no-plugin`
+to skip the companion; initialization does not enable it in Obsidian.
 Initialization creates missing files, preserves existing ones, supports
 `--dry-run`, and rolls back its own changes on failure.
 `arc verify` checks for the required baseline directories and files, and

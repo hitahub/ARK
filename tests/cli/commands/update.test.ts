@@ -24,7 +24,11 @@ describe('updateVault', () => {
     const parent = await createTemporaryDirectory();
     const target = path.join(parent, 'vault');
     vi.spyOn(console, 'log').mockImplementation(() => undefined);
-    await initializeVault('./vault', { cwd: parent, now: () => new Date(2032, 0, 1) });
+    await initializeVault('./vault', {
+      cwd: parent,
+      now: () => new Date(2032, 0, 1),
+      installPlugin: false,
+    });
     const dashboard = path.join(target, '000_Atlas/Dashboard.md');
     await fs.writeFile(dashboard, 'user-edited content');
     await fs.remove(path.join(target, '999_Templates/TPL_Weekly_Review.md'));
@@ -52,7 +56,11 @@ describe('updateVault', () => {
     const parent = await createTemporaryDirectory();
     const target = path.join(parent, 'vault');
     vi.spyOn(console, 'log').mockImplementation(() => undefined);
-    await initializeVault('./vault', { cwd: parent, now: () => new Date(2032, 0, 1) });
+    await initializeVault('./vault', {
+      cwd: parent,
+      now: () => new Date(2032, 0, 1),
+      installPlugin: false,
+    });
     const dashboard = path.join(target, '000_Atlas/Dashboard.md');
     await fs.writeFile(dashboard, 'custom content');
 
@@ -69,7 +77,11 @@ describe('updateVault', () => {
     const parent = await createTemporaryDirectory();
     const target = path.join(parent, 'vault');
     vi.spyOn(console, 'log').mockImplementation(() => undefined);
-    await initializeVault('./vault', { cwd: parent, now: () => new Date(2032, 0, 1) });
+    await initializeVault('./vault', {
+      cwd: parent,
+      now: () => new Date(2032, 0, 1),
+      installPlugin: false,
+    });
     const dashboard = path.join(target, '000_Atlas/Dashboard.md');
     const linked = path.join(parent, 'linked.md');
     await fs.writeFile(linked, 'user content');
@@ -87,7 +99,11 @@ describe('updateVault', () => {
     const target = path.join(parent, 'vault');
     const outside = path.join(parent, 'outside');
     vi.spyOn(console, 'log').mockImplementation(() => undefined);
-    await initializeVault('./vault', { cwd: parent, now: () => new Date(2032, 0, 1) });
+    await initializeVault('./vault', {
+      cwd: parent,
+      now: () => new Date(2032, 0, 1),
+      installPlugin: false,
+    });
     await fs.ensureDir(outside);
     await fs.writeFile(path.join(outside, 'Dashboard.md'), 'user content');
     await fs.remove(path.join(target, '000_Atlas'));

@@ -28,32 +28,38 @@ Use `arc init` without a path to scaffold the current directory after confirming
 the preview without prompting; changed scaffold files are backed up under
 `.arc-backups/` before replacement.
 
+`init` also installs the ARC Obsidian companion plugin by default into
+`.obsidian/plugins/arc-obsidian-plugin/`. Use `--no-plugin` to skip it. Existing
+plugin files are preserved, and Obsidian still requires enabling the plugin in
+its settings.
+
 ## Documentation
 
-| Guide                                                    | Description                                                                |
-| -------------------------------------------------------- | -------------------------------------------------------------------------- |
-| [Contributing](CONTRIBUTING.md)                          | Development setup, contribution workflow, and pull request guidance.       |
-| [Code of Conduct](CODE_OF_CONDUCT.md)                    | Community participation expectations.                                      |
-| [Security](SECURITY.md)                                  | How to report security vulnerabilities privately.                          |
-| [Getting started](docs/getting-started.md)               | Requirements, install and usage examples, CLI behavior, troubleshooting.   |
-| [ARC methodology](docs/methodology.md)                   | ACCESS, Zettelkasten, and iterative project execution.                     |
-| [Vault architecture](docs/architecture.md)               | ARC layers, information flow, metadata contract, and design principles.    |
-| [Vault structure](docs/vault-structure.md)               | Folder roles, scaffold tree, required baseline, and verification behavior. |
-| [Vault workflows](docs/vault-workflows.md)               | Practical capture, project, journal, review, and customization workflows.  |
-| [Templates and metadata](docs/templates-and-metadata.md) | Generated notes, frontmatter fields, status values, and Dataview queries.  |
-| [Obsidian setup](docs/obsidian-setup.md)                 | Dataview, Templater, Graph View, and AI/filesystem access limitations.     |
-| [ARC Obsidian plugin](docs/obsidian-plugin.md)           | Optional plugin build, local installation, and supported features.         |
-| [Development](docs/development.md)                       | Architecture, scripts, tests, build, and CI.                               |
-| [Releasing](docs/releasing.md)                           | Manual npm package release checklist.                                      |
-| [Roadmap](docs/roadmap.md)                               | Exploratory ideas that are not implemented in the current CLI.             |
-| [Project plan](docs/plans/00.plan.md)                    | Current project plan and vault architecture specification.                 |
+| Guide                                                               | Description                                                                |
+| ------------------------------------------------------------------- | -------------------------------------------------------------------------- |
+| [Contributing](CONTRIBUTING.md)                                     | Development setup, contribution workflow, and pull request guidance.       |
+| [Code of Conduct](CODE_OF_CONDUCT.md)                               | Community participation expectations.                                      |
+| [Security](SECURITY.md)                                             | How to report security vulnerabilities privately.                          |
+| [Getting started](docs/getting-started.md)                          | Requirements, install and usage examples, CLI behavior, troubleshooting.   |
+| [ARC methodology](docs/methodology.md)                              | ACCESS, Zettelkasten, and iterative project execution.                     |
+| [Vault architecture](docs/architecture.md)                          | ARC layers, information flow, metadata contract, and design principles.    |
+| [Vault structure](docs/vault-structure.md)                          | Folder roles, scaffold tree, required baseline, and verification behavior. |
+| [Vault workflows](docs/vault-workflows.md)                          | Practical capture, project, journal, review, and customization workflows.  |
+| [Templates and metadata](docs/templates-and-metadata.md)            | Generated notes, frontmatter fields, status values, and Dataview queries.  |
+| [Obsidian setup](docs/obsidian-setup.md)                            | Dataview, Templater, Graph View, and AI/filesystem access limitations.     |
+| [ARC Obsidian plugin](docs/obsidian-plugin.md)                      | Automatic installation, manual builds, and supported features.             |
+| [Development](docs/development.md)                                  | Architecture, scripts, tests, build, and CI.                               |
+| [Releasing](docs/releasing.md)                                      | Manual npm package release checklist.                                      |
+| [Roadmap](docs/roadmap.md)                                          | Current ecosystem capabilities and exploratory directions.                 |
+| [Plan index](docs/plans/README.md)                                  | Plan naming convention and project plan documents.                         |
+| [Project foundation plan](docs/plans/00.arc-cli-foundation.plan.md) | Original CLI scope and architecture specification.                         |
 
 ## Project status
 
 The CLI provides `init`, `verify`, report-only `health`, and confirmed `update`
-commands. An optional ARC Obsidian companion is available as source in
-`src/obsidian-plugin/`; MCP services, semantic linking, archive automation,
-and publishing integrations remain future explorations.
+commands. The ARC Obsidian companion is installed by `init` by default and can
+be skipped with `--no-plugin`; MCP services, semantic linking, archive
+automation, and publishing integrations remain future explorations.
 
 ## License
 

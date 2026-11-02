@@ -4,22 +4,28 @@ The optional ARC Vault Companion adds lightweight ARC-specific checks and note
 creation inside Obsidian. The CLI remains independent and works without the
 plugin.
 
-## Build and install locally
+## Install with ARC CLI
 
-From the repository root:
+`arc init` installs the built companion files into
+`.obsidian/plugins/arc-obsidian-plugin/` by default:
 
 ```bash
-pnpm install
-pnpm build:plugin
+arc init ./MyVault
 ```
 
-The build writes `manifest.json`, `main.js`, and `styles.css` to
+Use `arc init ./MyVault --no-plugin` to skip it. Existing plugin files are
+preserved and never overwritten by `init`. The CLI cannot enable plugins in
+Obsidian, so enable **ARC Vault Companion** under **Settings → Community
+plugins** after initialization.
+
+## Build and install manually
+
+From the repository root, run `pnpm build` (or `pnpm build:plugin` to build only
+the plugin). The build writes `manifest.json`, `main.js`, and `styles.css` to
 `dist/obsidian-plugin/`. Copy those files into
-`<vault>/.obsidian/plugins/arc-obsidian-plugin/`, then enable **ARC Vault
-Companion** under **Settings → Community plugins**. Restart or reload Obsidian
-after replacing the plugin files. The generated directory is prepared for a
-future community-plugin release, but no release or submission is performed by
-this build.
+`<vault>/.obsidian/plugins/arc-obsidian-plugin/`, then enable the plugin in
+Obsidian. The generated directory is prepared for a future community-plugin
+release, but no release or submission is performed by this build.
 
 ## Features
 
@@ -47,6 +53,7 @@ and configure any external clients separately.
 ```bash
 pnpm test
 pnpm typecheck
+pnpm build
 pnpm build:plugin
 ```
 

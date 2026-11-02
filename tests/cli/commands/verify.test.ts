@@ -26,6 +26,7 @@ describe('verifyVault', () => {
     await initializeVault('./vault', {
       cwd: parent,
       now: () => new Date(2032, 0, 1),
+      installPlugin: false,
     });
     await fs.writeFile(path.join(target, '300_Slipbox/My Note.md'), 'custom note');
     await fs.ensureDir(path.join(target, '200_Projects/My Project/Phase_01'));
@@ -43,6 +44,7 @@ describe('verifyVault', () => {
     await initializeVault('./vault', {
       cwd: parent,
       now: () => new Date(2032, 0, 1),
+      installPlugin: false,
     });
     await fs.ensureDir(path.join(target, '300_Slipbox/Subfolder'));
 
@@ -61,6 +63,7 @@ describe('verifyVault', () => {
     await initializeVault('./vault', {
       cwd: parent,
       now: () => new Date(2032, 0, 1),
+      installPlugin: false,
     });
     await fs.ensureDir(path.join(parent, 'linked-directory'));
     await fs.symlink(

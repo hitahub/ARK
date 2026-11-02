@@ -32,10 +32,19 @@ Vault/
 │   ├── TPL_Tech_Architecture.md
 │   ├── TPL_Meeting_Note.md
 │   └── TPL_Weekly_Review.md
+├── .obsidian/
+│   └── plugins/
+│       └── arc-obsidian-plugin/
+│           ├── manifest.json
+│           ├── main.js
+│           └── styles.css
 └── .claudeignore
 ```
 
 `.gitkeep` marker files are placed in empty folders where needed. `000_Atlas/` contains Markdown files; `300_Slipbox/` gets a `.gitkeep` marker when initially scaffolded.
+The ARC companion plugin files are included by default; `arc init --no-plugin`
+skips them. They are not required by `arc verify`, and the plugin still needs to
+be enabled in Obsidian's settings.
 
 ## Folder responsibilities
 
@@ -48,7 +57,7 @@ Vault/
 | `200_Projects/<project>/Past_Phases_Archive/` | Optional place for completed phases. Moving content here and updating project links/status are manual actions.                                                                                                           |
 | `300_Slipbox/`                                | Flat collection of reusable concept and technical notes. Keep each note directly in this folder and connect related concepts with descriptive wikilinks. No direct child directories are allowed by `arc verify`.        |
 | `400_Journal/<year>/`                         | Time-ordered records such as daily journals, meetings, and reviews. Initialization creates the current local calendar-year directory; later years are created by the user.                                               |
-| `999_Templates/`                              | Markdown template sources for Templater. The CLI creates them but does not install, configure, or invoke the Obsidian plugin.                                                                                            |
+| `999_Templates/`                              | Markdown template sources for Templater. The CLI creates them but does not install, configure, or invoke Templater.                                                                                                      |
 | `.claudeignore`                               | Best-effort exclusion hints for Claude clients that honor this file. It is not a security or access-control boundary.                                                                                                    |
 
 ### Number prefixes

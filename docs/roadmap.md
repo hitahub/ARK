@@ -8,9 +8,9 @@ implementation commitments are made.
 ## 1. ARC Obsidian plugin
 
 An in-repository companion plugin is available under
-`src/obsidian-plugin/`. Build it with `pnpm build:plugin`; this generates
-community-plugin-ready files in `dist/obsidian-plugin/` without publishing them. See the
-[plugin guide](obsidian-plugin.md) for local installation instructions. It
+`src/obsidian-plugin/`. `pnpm build` produces its files alongside the CLI, and
+`arc init` installs them into the vault by default (or skips them with
+`--no-plugin`). See the [plugin guide](obsidian-plugin.md) for details. It
 provides a read-only Slipbox structure warning, explicit ARC note creation, and
 unresolved-wikilink diagnostics for the active note.
 
