@@ -14,15 +14,19 @@ arc init ./MyVault
 ```
 
 Use `arc init ./MyVault --no-plugin` to skip it. Existing plugin files are
-preserved and never overwritten by `init`. The CLI cannot enable plugins in
-Obsidian, so enable **ARC Vault Companion** under **Settings → Community
-plugins** after initialization.
+preserved when their manifest version matches the CLI bundle. If the versions
+differ, `init` asks before replacing plugin assets; accepting backs up the
+replaced files under `.arc-backups/`, while declining preserves the installed
+plugin. The CLI cannot enable plugins in Obsidian, so enable **ARC Vault
+Companion** under **Settings → Community plugins** after initialization.
 
 ## Build and install manually
 
 From the repository root, run `pnpm build` (or `pnpm build:plugin` to build only
-the plugin). The build writes `manifest.json`, `main.js`, and `styles.css` to
-`dist/obsidian-plugin/`. Copy those files into
+the plugin). The generated manifest version is taken from the root
+`package.json`, keeping the CLI and plugin release versions aligned. The build
+writes `manifest.json`, `main.js`, and `styles.css` to `dist/obsidian-plugin/`.
+Copy those files into
 `<vault>/.obsidian/plugins/arc-obsidian-plugin/`, then enable the plugin in
 Obsidian. The generated directory is prepared for a future community-plugin
 release, but no release or submission is performed by this build.

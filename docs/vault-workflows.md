@@ -90,5 +90,6 @@ are queried differently and have different metadata.
   to those folders.
 - If you rename metadata fields or status values, update templates and
   Dataview filters together.
-- Keep in mind that running `arc init` again preserves existing files; it
-  does not replace them with updated template content.
+- Keep in mind that running `arc init` again preserves existing scaffold files;
+  it does not replace them with updated template content. A mismatched ARC
+  plugin version is updated only after confirmation and with backups.

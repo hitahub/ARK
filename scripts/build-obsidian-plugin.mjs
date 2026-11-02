@@ -1,10 +1,15 @@
-import { copyFile, mkdir } from 'node:fs/promises';
+import { copyFile, mkdir, readFile, writeFile } from 'node:fs/promises';
 import { resolve } from 'node:path';
 import { build } from 'esbuild';
 
 const root = process.cwd();
 const outputDirectory = resolve(root, 'dist/obsidian-plugin');
 const pluginSource = resolve(root, 'src/obsidian-plugin');
+const packageInfo = JSON.parse(await readFile(resolve(root, 'package.json'), 'utf8'));
+const manifest = JSON.parse(await readFile(resolve(pluginSource, 'manifest.json'), 'utf8'));
+if (typeof packageInfo.version !== 'string' || packageInfo.version.length === 0) {
+  throw new Error('package.json must provide a non-empty version for the plugin manifest.');
+}
 
 await mkdir(outputDirectory, { recursive: true });
 await build({
@@ -15,10 +20,14 @@ await build({
   format: 'cjs',
   target: 'es2018',
 });
-await Promise.all(
-  ['manifest.json', 'styles.css'].map((file) =>
-    copyFile(resolve(pluginSource, file), resolve(outputDirectory, file)),
+manifest.version = packageInfo.version;
+await Promise.all([
+  copyFile(resolve(pluginSource, 'styles.css'), resolve(outputDirectory, 'styles.css')),
+  writeFile(
+    resolve(outputDirectory, 'manifest.json'),
+    `${JSON.stringify(manifest, null, 2)}\n`,
+    'utf8',
   ),
-);
+]);
 
 console.log(`Obsidian plugin artifacts written to ${outputDirectory}`);
