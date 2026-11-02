@@ -107,5 +107,7 @@ It does **not** require `.gitkeep` markers, a particular year directory, `210_Pr
 
 Verification checks for presence and basic file/directory types. It does not validate Markdown content, frontmatter correctness, Dataview results, or the user's entire vault layout.
 
-`arc init` preserves existing files, including templates and indexes. Re-running
-it does not update their contents when the scaffold changes.
+`arc init` preserves existing scaffold files, including templates and indexes.
+The installed ARC plugin is also preserved unless its manifest version differs
+from the CLI bundle and the user confirms an update; replaced plugin assets are
+backed up under `.arc-backups/`.

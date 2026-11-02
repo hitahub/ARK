@@ -93,8 +93,10 @@ Markdown, an example project layout, `.gitkeep` markers where needed, a journal
 directory for the current local year, a best-effort `.claudeignore`, and the
 ARC Vault Companion plugin files under `.obsidian/plugins/`. Use `--no-plugin`
 to skip the companion; initialization does not enable it in Obsidian.
-Initialization creates missing files, preserves existing ones, supports
-`--dry-run`, and rolls back its own changes on failure.
+Initialization creates missing files, preserves existing scaffold content,
+supports `--dry-run`, and rolls back its own changes on failure. A version
+mismatch in an installed ARC plugin triggers a confirmation prompt; accepted
+updates are backed up under `.arc-backups/`.
 `arc verify` checks for the required baseline directories and files, and
 enforces only one content convention: no directory directly inside
 `300_Slipbox/`. `arc health` additionally reports unresolved local links,

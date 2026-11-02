@@ -1,6 +1,6 @@
 # ARC CLI
 
-ARC CLI scaffolds, verifies, inspects, and safely updates an **Atomic Rosetta Contextual (ARC)** knowledge vault. It creates an Obsidian-friendly folder structure, Markdown dashboards, and starter templates while preserving existing files.
+ARC CLI scaffolds, verifies, inspects, and safely updates an **Atomic Rosetta Contextual (ARC)** knowledge vault. It creates an Obsidian-friendly folder structure, Markdown dashboards, and starter templates while preserving existing files unless a user confirms a plugin version update.
 
 > The npm package is named `@hitahub/arc`; the executable is named `arc`. The `npx` and `pnpm dlx` commands below require the package to be published and accessible from your configured registry.
 
@@ -22,7 +22,7 @@ pnpm dlx @hitahub/arc health ./MyNewVault
 pnpm dlx @hitahub/arc update ./MyNewVault
 ```
 
-Use `arc init` without a path to scaffold the current directory after confirming. Initialization creates missing files and never overwrites existing files.
+Use `arc init` without a path to scaffold the current directory after confirming. Initialization creates missing files and preserves existing ones, except for an ARC plugin update explicitly confirmed by the user.
 
 `init` and `update` support `--dry-run` to preview changes. `update --yes` applies
 the preview without prompting; changed scaffold files are backed up under
@@ -30,8 +30,10 @@ the preview without prompting; changed scaffold files are backed up under
 
 `init` also installs the ARC Obsidian companion plugin by default into
 `.obsidian/plugins/arc-obsidian-plugin/`. Use `--no-plugin` to skip it. Existing
-plugin files are preserved, and Obsidian still requires enabling the plugin in
-its settings.
+plugin files are preserved unless the installed ARC plugin version differs from
+the CLI bundle; in that case, `init` asks before updating and backs up replaced
+files under `.arc-backups/`. Declining preserves the installed plugin. Obsidian
+still requires enabling the plugin in its settings.
 
 ## Documentation
 

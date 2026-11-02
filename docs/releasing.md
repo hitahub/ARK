@@ -32,6 +32,12 @@ Inspect the dry-run output. It should include `README.md`, `docs/`, `bin/cli.mjs
 
 Review the version in `package.json`. Maintainers should select and update the release version in a separate reviewed change. Do not edit generated lockfile metadata manually; if the versioning change affects `pnpm-lock.yaml`, regenerate it with pnpm and review the resulting diff.
 
+The plugin build writes this same version into
+`dist/obsidian-plugin/manifest.json`; verify the built manifest matches
+`package.json` before publishing. The source plugin manifest's version is kept
+aligned for repository clarity, but the build output always uses the package
+version as its source of truth.
+
 ## Publish
 
 For the first public release of a scoped package, publish with explicit public access:

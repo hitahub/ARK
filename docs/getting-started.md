@@ -72,10 +72,10 @@ The package is not downloaded from the registry when using `node bin/cli.mjs`.
 
 - If `path` is omitted, the target is the current working directory and the CLI asks for confirmation before writing.
 - If `path` is supplied, the CLI creates that directory if necessary and does not prompt.
-- Missing directories and generated files are created. Existing files are preserved and reported; there is no overwrite/force mode.
+- Missing directories and generated files are created. Existing scaffold files are preserved and reported; there is no general overwrite/force mode.
 - A directory occupying a generated file path is an error.
 - A local-calendar-year folder is created in `400_Journal/`.
-- The ARC Obsidian companion's `manifest.json`, `main.js`, and `styles.css` are installed to `.obsidian/plugins/arc-obsidian-plugin/` by default. Existing files are preserved. Use `--no-plugin` to skip the plugin; Obsidian must still be told to enable it in Settings.
+- The ARC Obsidian companion's `manifest.json`, `main.js`, and `styles.css` are installed to `.obsidian/plugins/arc-obsidian-plugin/` by default. Existing files are preserved unless the installed ARC plugin version differs, in which case `init` asks before updating and backs up replaced files under `.arc-backups/`. Use `--no-plugin` to skip the plugin; Obsidian must still be told to enable it in Settings.
 - `--dry-run` also previews the plugin files. Plugin installation requires the bundled plugin assets; `pnpm build` creates them for checkout usage.
 - An I/O error is surfaced and results in a non-zero process exit code. Newly created files that still contain generated content and empty directories are rolled back; existing or subsequently changed content is left intact.
 - `--dry-run` previews files without writing. The current-directory confirmation still applies when the path is omitted.
