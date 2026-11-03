@@ -22,7 +22,15 @@ the Obsidian community plugin directory.
 
 ## 2. ARC-aware MCP server
 
-Explore semantic tools such as `get_active_projects()`, `search_slipbox_by_tag()`, and `create_task()` as an alternative interface to generic filesystem access. Evaluate permission boundaries, client compatibility, data freshness, and whether structured responses improve retrieval or token use. Structured output does not inherently prevent hallucinations.
+The optional, read-only `arc mcp <vault-path>` server exposes
+`get_active_projects`, `search_slipbox_by_tag`, and `get_note` over MCP stdio.
+It limits access to project index notes and direct Slipbox notes in the
+explicitly selected vault. See the [MCP server guide](mcp-server.md) for its
+contract and filesystem limitations.
+
+Write-capable tools such as `create_task()` remain exploratory and require a
+separate scope decision. Structured output does not inherently prevent
+hallucinations or provide a security boundary.
 
 ## 3. Vault health checks and Git integration
 
