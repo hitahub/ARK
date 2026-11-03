@@ -5,6 +5,7 @@ import { reportVerification, verifyVault } from './commands/verify.js';
 import { inspectVaultHealth, reportHealth } from './commands/health.js';
 import { updateVault, type UpdateOptions } from './commands/update.js';
 import { archiveProject, type ArchiveOptions } from './commands/archive.js';
+import { installGitHook, uninstallGitHook, type GitHookOptions } from './commands/hook.js';
 import { logger } from './utils/logger.js';
 
 // Read the package version so the --version flag stays aligned with published metadata.
@@ -17,9 +18,12 @@ export interface CliDependencies {
   health?: typeof inspectVaultHealth;
   update?: typeof updateVault;
   archive?: typeof archiveProject;
+  installHook?: typeof installGitHook;
+  uninstallHook?: typeof uninstallGitHook;
   initOptions?: InitOptions;
   updateOptions?: UpdateOptions;
   archiveOptions?: ArchiveOptions;
+  gitHookOptions?: GitHookOptions;
 }
 
 /**
@@ -35,6 +39,8 @@ export function createProgram(dependencies: CliDependencies = {}): Command {
   const health = dependencies.health ?? inspectVaultHealth;
   const update = dependencies.update ?? updateVault;
   const archive = dependencies.archive ?? archiveProject;
+  const installHook = dependencies.installHook ?? installGitHook;
+  const uninstallHook = dependencies.uninstallHook ?? uninstallGitHook;
 
   program
     .name('arc')
@@ -120,6 +126,35 @@ export function createProgram(dependencies: CliDependencies = {}): Command {
         });
       },
     );
+
+  const hook = program.command('hook').description('Manage the opt-in ARC Git pre-commit hook');
+
+  hook
+    .command('install')
+    .description('Preview or install ARC health checks as a pre-commit hook')
+    .argument('<vault-path>', 'vault directory to inspect before commits')
+    .option('--repo <path>', 'Git repository directory', process.cwd())
+    .option('--dry-run', 'preview the hook installation without changing files')
+    .action(async (targetPath: string, commandOptions: { repo: string; dryRun?: boolean }) => {
+      await installHook(targetPath, {
+        ...dependencies.gitHookOptions,
+        repoPath: commandOptions.repo,
+        ...(commandOptions.dryRun ? { dryRun: true } : {}),
+      });
+    });
+
+  hook
+    .command('uninstall')
+    .description('Preview or remove an intact ARC-managed pre-commit hook')
+    .option('--repo <path>', 'Git repository directory', process.cwd())
+    .option('--dry-run', 'preview hook removal without changing files')
+    .action(async (commandOptions: { repo: string; dryRun?: boolean }) => {
+      await uninstallHook({
+        ...dependencies.gitHookOptions,
+        repoPath: commandOptions.repo,
+        ...(commandOptions.dryRun ? { dryRun: true } : {}),
+      });
+    });
 
   return program;
 }

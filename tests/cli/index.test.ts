@@ -92,6 +92,47 @@ describe('CLI routing', () => {
     expect(archive).toHaveBeenCalledWith('Project', './vault', { dryRun: true });
   });
 
+  it('routes hook installation with the selected vault and repository', async () => {
+    const installHook = vi.fn().mockResolvedValue({
+      action: 'install',
+      hookPath: '/repo/.git/hooks/pre-commit',
+      vaultPath: '/vault',
+      changed: false,
+      dryRun: true,
+    });
+    const program = createProgram({ installHook }).exitOverride();
+
+    await program.parseAsync([
+      'node',
+      'arc',
+      'hook',
+      'install',
+      '/vault',
+      '--repo',
+      '/repo',
+      '--dry-run',
+    ]);
+
+    expect(installHook).toHaveBeenCalledWith('/vault', {
+      repoPath: '/repo',
+      dryRun: true,
+    });
+  });
+
+  it('routes hook removal with preview options', async () => {
+    const uninstallHook = vi.fn().mockResolvedValue({
+      action: 'uninstall',
+      hookPath: '/repo/.git/hooks/pre-commit',
+      changed: false,
+      dryRun: true,
+    });
+    const program = createProgram({ uninstallHook }).exitOverride();
+
+    await program.parseAsync(['node', 'arc', 'hook', 'uninstall', '--repo', '/repo', '--dry-run']);
+
+    expect(uninstallHook).toHaveBeenCalledWith({ repoPath: '/repo', dryRun: true });
+  });
+
   it('registers a version option', () => {
     const program = createProgram();
 
