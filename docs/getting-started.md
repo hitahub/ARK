@@ -26,6 +26,7 @@ npx @hitahub/arc verify ./MyNewVault
 npx @hitahub/arc health ./MyNewVault
 npx @hitahub/arc update ./MyNewVault
 npx @hitahub/arc archive "Project Alpha" ./MyNewVault --dry-run
+npx @hitahub/arc hook install ./MyNewVault --repo . --dry-run
 npx @hitahub/arc init ./PreviewVault --dry-run
 npx @hitahub/arc update ./MyNewVault --dry-run
 ```
@@ -41,6 +42,7 @@ pnpm dlx @hitahub/arc verify ./MyNewVault
 pnpm dlx @hitahub/arc health ./MyNewVault
 pnpm dlx @hitahub/arc update ./MyNewVault
 pnpm dlx @hitahub/arc archive "Project Alpha" ./MyNewVault --dry-run
+pnpm dlx @hitahub/arc hook install ./MyNewVault --repo . --dry-run
 ```
 
 If installed globally, invoke the binary directly:
@@ -92,6 +94,41 @@ Additional user folders and files are allowed. The example project is scaffolded
 ## `health` behavior
 
 `arc health [path]` reports unresolved local Markdown and Obsidian wikilinks, notes under the ARC content layers with no inbound links, and all structural findings from `verify`. External URLs, links inside code, template source files, and valid links to folders are ignored. It is a report-only check: it never changes the vault. Findings cause a non-zero exit status. Orphan detection is heuristic and does not validate headings, metadata fields, or Dataview query results.
+
+## Git hook integration
+
+ARC can run its existing `health` checks before commits through an explicitly
+installed local Git `pre-commit` hook. Nothing in `init`, `health`, or other
+commands installs or changes hooks.
+
+Run the command from the Git repository (or pass its path with `--repo`); the
+vault path is required and may be outside the repository:
+
+```bash
+arc hook install ./MyNewVault --repo . --dry-run
+arc hook install ./MyNewVault --repo .
+arc hook uninstall --repo .
+```
+
+The preview reports the hook and vault paths without changing files. Installation
+rejects custom `core.hooksPath` settings, occupied hook locations, and unsafe
+symlinked hook paths; it never replaces or chains an existing hook. Repeating
+installation for the same vault is safe. Removal deletes only an intact ARC
+hook and can also be previewed with `--dry-run`.
+
+The hook invokes the `arc health` check for the resolved vault path. Run
+`arc health` before installation to review existing findings; any health
+finding or operational error blocks commits. Checks remain read-only and do
+not modify notes or the index. Because the hook is local clone configuration,
+it is not shared with teammates and is not an access-control, security, or CI
+guarantee. CI and other repository policy should enforce any required checks
+independently. The hook uses the Node and ARC installation active during setup;
+uninstall it before moving/removing that installation, or reinstall it at its
+new location. If checks are too slow for interactive commits, opt out with
+`arc hook uninstall --repo .`.
+
+Git hook integration is optional and user-managed. Do not opt another user or
+repository into it without their explicit consent.
 
 ## `update` behavior
 

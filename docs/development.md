@@ -55,6 +55,9 @@ Verification checks the required directory/file baseline and checks direct entri
 `archive` moves a project marked `status: done` into `900_Archive/Projects/`,
 changes its index status to `archived`, rejects collisions and unsafe entries,
 and rolls the move back if updating metadata fails.
+`hook install` and `hook uninstall` explicitly manage an ARC-owned pre-commit
+hook. The hook invokes the existing report-only health command for a resolved
+vault path and never replaces an existing hook or custom `core.hooksPath`.
 
 ## Useful commands
 
@@ -91,6 +94,8 @@ Tests use Vitest and run against temporary directories. The current suite covers
 - health findings for broken links, orphans, and structural issues;
 - update confirmation, backups, and symlink preservation.
 - archive previews, confirmation, collisions, metadata, unsafe entries, and rollback;
+- Git hook preview, idempotent install/removal, conflicts, non-Git paths,
+  symlink safety, and linked worktrees;
 - plugin installation by default, opt-out, dry-run, collision preservation, and symlink safety.
 
 Run all tests with `pnpm test`.

@@ -14,6 +14,11 @@ npx @hitahub/arc update ./MyNewVault
 npx @hitahub/arc archive "Project Alpha" ./MyNewVault --dry-run
 ```
 
+Git hooks are opt-in. Preview and explicitly install ARC's health check in a
+Git repository with `arc hook install ./MyNewVault --repo . --dry-run`, then
+repeat without `--dry-run` to install. See
+[Getting started](docs/getting-started.md#git-hook-integration) for details.
+
 Or with pnpm:
 
 ```bash
@@ -22,6 +27,7 @@ pnpm dlx @hitahub/arc verify ./MyNewVault
 pnpm dlx @hitahub/arc health ./MyNewVault
 pnpm dlx @hitahub/arc update ./MyNewVault
 pnpm dlx @hitahub/arc archive "Project Alpha" ./MyNewVault --dry-run
+pnpm dlx @hitahub/arc hook install ./MyNewVault --repo . --dry-run
 ```
 
 Use `arc init` without a path to scaffold the current directory after confirming. Initialization creates missing files and preserves existing ones, except for an ARC plugin update explicitly confirmed by the user.
@@ -65,7 +71,7 @@ still requires enabling the plugin in its settings.
 ## Project status
 
 The CLI provides `init`, `verify`, report-only `health`, confirmed `update`,
-and safe project `archive` commands. The ARC Obsidian companion is installed
+safe project `archive`, and explicit opt-in Git hook commands. The ARC Obsidian companion is installed
 by `init` by default and can be skipped with `--no-plugin`; MCP services,
 semantic linking, and publishing integrations remain future explorations.
 

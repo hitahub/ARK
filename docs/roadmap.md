@@ -27,9 +27,11 @@ Explore semantic tools such as `get_active_projects()`, `search_slipbox_by_tag()
 ## 3. Vault health checks and Git integration
 
 The report-only `arc health` command now checks broken local Markdown/wikilinks,
-orphan notes in ARC content layers, and structural baseline findings. Future
-work could improve Markdown compatibility and add an opt-in Git hook integration
-for users who want checks before committing. Do not install hooks silently.
+orphan notes in ARC content layers, and structural baseline findings. The
+explicit `arc hook install|uninstall` commands optionally run those same checks
+before commits; they preview changes, reject occupied or custom hook locations,
+and never install hooks silently. Future work could improve Markdown
+compatibility. Local hooks are not a CI or security guarantee.
 
 ## 4. Semantic auto-link suggestions
 
