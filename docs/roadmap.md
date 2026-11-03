@@ -41,9 +41,14 @@ before commits; they preview changes, reject occupied or custom hook locations,
 and never install hooks silently. Future work could improve Markdown
 compatibility. Local hooks are not a CI or security guarantee.
 
-## 4. Semantic auto-link suggestions
+## 4. Slipbox link suggestions
 
-Explore an offline embedding workflow that suggests related Slipbox notes, potentially using a local model. Suggestions should be reviewable and must not silently rewrite user notes.
+`arc links suggest <vault-path>` reports bounded, deterministic lexical
+matches among direct Markdown notes in `300_Slipbox/`. It is offline and
+read-only; users review and apply any links themselves. Embedding-based
+matching, model management, caching, and saved reports remain exploratory
+follow-ups, not current behavior. See
+[Getting started](getting-started.md#links-suggest-behavior) for its limits.
 
 ## 5. Project lifecycle automation
 

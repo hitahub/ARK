@@ -7,6 +7,7 @@ import { updateVault, type UpdateOptions } from './commands/update.js';
 import { archiveProject, type ArchiveOptions } from './commands/archive.js';
 import { installGitHook, uninstallGitHook, type GitHookOptions } from './commands/hook.js';
 import { startMcpServer } from './commands/mcp.js';
+import { reportLinkSuggestions, suggestRelatedNotes } from './commands/links.js';
 import { logger } from './utils/logger.js';
 
 // Read the package version so the --version flag stays aligned with published metadata.
@@ -22,6 +23,7 @@ export interface CliDependencies {
   installHook?: typeof installGitHook;
   uninstallHook?: typeof uninstallGitHook;
   mcp?: typeof startMcpServer;
+  suggestLinks?: typeof suggestRelatedNotes;
   initOptions?: InitOptions;
   updateOptions?: UpdateOptions;
   archiveOptions?: ArchiveOptions;
@@ -44,6 +46,7 @@ export function createProgram(dependencies: CliDependencies = {}): Command {
   const installHook = dependencies.installHook ?? installGitHook;
   const uninstallHook = dependencies.uninstallHook ?? uninstallGitHook;
   const mcp = dependencies.mcp ?? startMcpServer;
+  const suggestLinks = dependencies.suggestLinks ?? suggestRelatedNotes;
 
   program
     .name('arc')
@@ -101,6 +104,17 @@ export function createProgram(dependencies: CliDependencies = {}): Command {
     .argument('<vault-path>', 'explicit vault directory to expose to MCP tools')
     .action(async (vaultPath: string) => {
       await mcp(vaultPath);
+    });
+
+  program
+    .command('links')
+    .description('Discover likely related Slipbox notes')
+    .command('suggest')
+    .description('Suggest related direct Slipbox notes without editing them')
+    .argument('<vault-path>', 'explicit vault directory to analyze')
+    .action(async (vaultPath: string) => {
+      const result = await suggestLinks(vaultPath);
+      reportLinkSuggestions(result);
     });
 
   program

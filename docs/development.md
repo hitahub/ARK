@@ -16,7 +16,7 @@ pnpm install
 ```text
 bin/cli.mjs             Executable entry; imports the built ESM bundle
 src/cli/index.ts                  Commander program and error handling
-src/cli/commands/                 CLI commands, including archive and the MCP server
+src/cli/commands/                 CLI commands, including archive, link suggestions, and MCP
 src/cli/templates/                Markdown/Templater strings and scaffold registry
 src/cli/utils/                    Filesystem and logging helpers
 src/obsidian-plugin/               Obsidian entry point, templates, and diagnostics
@@ -105,6 +105,8 @@ Tests use Vitest and run against temporary directories. The current suite covers
   symlink safety, and linked worktrees;
 - MCP tool schemas and results, metadata errors, content and result limits,
   vault-relative path boundaries, symlink rejection, and read-only behavior;
+- local Slipbox link suggestion ranking, scan limits, symlink rejection, CLI
+  routing, and read-only behavior;
 - plugin installation by default, opt-out, dry-run, collision preservation, and symlink safety.
 
 Run all tests with `pnpm test`.
