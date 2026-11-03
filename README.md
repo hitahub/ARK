@@ -12,6 +12,7 @@ npx @hitahub/arc verify ./MyNewVault
 npx @hitahub/arc health ./MyNewVault
 npx @hitahub/arc update ./MyNewVault
 npx @hitahub/arc archive "Project Alpha" ./MyNewVault --dry-run
+npx @hitahub/arc links suggest ./MyNewVault
 npx @hitahub/arc mcp /absolute/path/to/your/vault
 ```
 
@@ -29,6 +30,7 @@ pnpm dlx @hitahub/arc health ./MyNewVault
 pnpm dlx @hitahub/arc update ./MyNewVault
 pnpm dlx @hitahub/arc archive "Project Alpha" ./MyNewVault --dry-run
 pnpm dlx @hitahub/arc hook install ./MyNewVault --repo . --dry-run
+pnpm dlx @hitahub/arc links suggest ./MyNewVault
 pnpm dlx @hitahub/arc mcp /absolute/path/to/your/vault
 ```
 
@@ -48,6 +50,11 @@ plugin files are preserved unless the installed ARC plugin version differs from
 the CLI bundle; in that case, `init` asks before updating and backs up replaced
 files under `.arc-backups/`. Declining preserves the installed plugin. Obsidian
 still requires enabling the plugin in its settings.
+
+`links suggest` reports up to 20 local lexical matches among direct Markdown
+notes in `300_Slipbox/`. It requires an explicit vault path, uses no model or
+network service, and never modifies notes. Review suggestions manually; the
+ranking is heuristic, not evidence that two notes are related.
 
 ## Documentation
 
@@ -74,10 +81,11 @@ still requires enabling the plugin in its settings.
 ## Project status
 
 The CLI provides `init`, `verify`, report-only `health`, confirmed `update`,
-safe project `archive`, explicit opt-in Git hook commands, and an opt-in
-read-only MCP server. The ARC Obsidian companion is installed by `init` by
-default and can be skipped with `--no-plugin`; semantic linking and publishing
-integrations remain future explorations.
+safe project `archive`, explicit opt-in Git hook commands, an opt-in read-only
+MCP server, and local Slipbox link suggestions. The ARC Obsidian companion is
+installed by `init` by default and can be skipped with `--no-plugin`;
+embedding-based matching and publishing integrations remain future
+explorations.
 
 ## License
 

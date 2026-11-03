@@ -74,6 +74,20 @@ describe('CLI routing', () => {
     expect(mcp).toHaveBeenCalledWith('/vault');
   });
 
+  it('routes link suggestions for the explicitly selected vault', async () => {
+    const suggestLinks = vi.fn().mockResolvedValue({
+      vaultPath: '/vault',
+      noteCount: 0,
+      candidates: [],
+    });
+    vi.spyOn(console, 'log').mockImplementation(() => undefined);
+    const program = createProgram({ suggestLinks }).exitOverride();
+
+    await program.parseAsync(['node', 'arc', 'links', 'suggest', '/vault']);
+
+    expect(suggestLinks).toHaveBeenCalledWith('/vault');
+  });
+
   it('routes update with explicit non-interactive confirmation', async () => {
     const update = vi.fn().mockResolvedValue({
       updated: [],

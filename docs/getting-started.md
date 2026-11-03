@@ -26,6 +26,7 @@ npx @hitahub/arc verify ./MyNewVault
 npx @hitahub/arc health ./MyNewVault
 npx @hitahub/arc update ./MyNewVault
 npx @hitahub/arc archive "Project Alpha" ./MyNewVault --dry-run
+npx @hitahub/arc links suggest ./MyNewVault
 npx @hitahub/arc hook install ./MyNewVault --repo . --dry-run
 npx @hitahub/arc init ./PreviewVault --dry-run
 npx @hitahub/arc update ./MyNewVault --dry-run
@@ -42,6 +43,7 @@ pnpm dlx @hitahub/arc verify ./MyNewVault
 pnpm dlx @hitahub/arc health ./MyNewVault
 pnpm dlx @hitahub/arc update ./MyNewVault
 pnpm dlx @hitahub/arc archive "Project Alpha" ./MyNewVault --dry-run
+pnpm dlx @hitahub/arc links suggest ./MyNewVault
 pnpm dlx @hitahub/arc hook install ./MyNewVault --repo . --dry-run
 ```
 
@@ -54,6 +56,7 @@ arc verify ./MyNewVault
 arc health ./MyNewVault
 arc update ./MyNewVault
 arc archive "Project Alpha" ./MyNewVault --dry-run
+arc links suggest ./MyNewVault
 ```
 
 ## Run from a checkout
@@ -67,6 +70,7 @@ node bin/cli.mjs init ./MyNewVault
 node bin/cli.mjs verify ./MyNewVault
 node bin/cli.mjs health ./MyNewVault
 node bin/cli.mjs update ./MyNewVault
+node bin/cli.mjs links suggest ./MyNewVault
 ```
 
 The package is not downloaded from the registry when using `node bin/cli.mjs`.
@@ -94,6 +98,23 @@ Additional user folders and files are allowed. The example project is scaffolded
 ## `health` behavior
 
 `arc health [path]` reports unresolved local Markdown and Obsidian wikilinks, notes under the ARC content layers with no inbound links, and all structural findings from `verify`. External URLs, links inside code, template source files, and valid links to folders are ignored. It is a report-only check: it never changes the vault. Findings cause a non-zero exit status. Orphan detection is heuristic and does not validate headings, metadata fields, or Dataview query results.
+
+## `links suggest` behavior
+
+`arc links suggest <vault-path>` requires an explicit vault directory and
+analyzes only direct, non-hidden Markdown files in `300_Slipbox/`. It uses
+deterministic local TF-IDF cosine similarity; frontmatter and code blocks do
+not contribute to matching. The report shows at most 20 pairs that share at
+least two non-stopword terms and meet the minimum similarity threshold,
+alongside the strongest shared terms. Scores are heuristic and do not establish
+that notes are meaningfully related. The minimum cosine similarity is 0.12.
+
+The scan is bounded to 500 notes, 64 KiB per note, 8 MiB total content, 100,000
+unique terms, 2,000 directory entries, and 1,000,000 term-pair comparisons.
+Exceeding a limit or encountering an unsafe symlink or unreadable/invalid note
+is reported as an error rather than silently truncating results. The command
+performs no network requests, model downloads, caching, or file writes. Review
+every suggestion and apply any links manually.
 
 ## Git hook integration
 
