@@ -4,6 +4,7 @@ import { initializeVault, type InitOptions } from './commands/init.js';
 import { reportVerification, verifyVault } from './commands/verify.js';
 import { inspectVaultHealth, reportHealth } from './commands/health.js';
 import { updateVault, type UpdateOptions } from './commands/update.js';
+import { archiveProject, type ArchiveOptions } from './commands/archive.js';
 import { logger } from './utils/logger.js';
 
 // Read the package version so the --version flag stays aligned with published metadata.
@@ -15,15 +16,17 @@ export interface CliDependencies {
   verify?: typeof verifyVault;
   health?: typeof inspectVaultHealth;
   update?: typeof updateVault;
+  archive?: typeof archiveProject;
   initOptions?: InitOptions;
   updateOptions?: UpdateOptions;
+  archiveOptions?: ArchiveOptions;
 }
 
 /**
  * Create the ARC command tree, optionally replacing command implementations for tests.
  *
  * @param dependencies Implementations and options injected into registered commands.
- * @returns A Commander program configured with `init`, `verify`, `health`, and `update`.
+ * @returns A Commander program configured with the ARC CLI commands.
  */
 export function createProgram(dependencies: CliDependencies = {}): Command {
   const program = new Command();
@@ -31,6 +34,7 @@ export function createProgram(dependencies: CliDependencies = {}): Command {
   const verify = dependencies.verify ?? verifyVault;
   const health = dependencies.health ?? inspectVaultHealth;
   const update = dependencies.update ?? updateVault;
+  const archive = dependencies.archive ?? archiveProject;
 
   program
     .name('arc')
@@ -95,6 +99,27 @@ export function createProgram(dependencies: CliDependencies = {}): Command {
         ...(commandOptions.dryRun ? { dryRun: true } : {}),
       });
     });
+
+  program
+    .command('archive')
+    .description('Move a completed project into archive storage')
+    .argument('<project-name>', 'project folder name under 200_Projects')
+    .argument('[path]', 'vault directory', process.cwd())
+    .option('--yes', 'archive without prompting')
+    .option('--dry-run', 'preview the archive without moving files')
+    .action(
+      async (
+        projectName: string,
+        targetPath: string,
+        commandOptions: { yes?: boolean; dryRun?: boolean },
+      ) => {
+        await archive(projectName, targetPath, {
+          ...dependencies.archiveOptions,
+          ...(commandOptions.yes ? { yes: true } : {}),
+          ...(commandOptions.dryRun ? { dryRun: true } : {}),
+        });
+      },
+    );
 
   return program;
 }

@@ -42,7 +42,9 @@ deadline:
 
 The suggested project status vocabulary is `active`, `on-hold`, `done`, and
 `archived`. The generated example uses `active`. The Dashboard's Active
-Projects table only selects `status: active`.
+Projects table only selects `status: active`. `arc archive` accepts only
+projects marked `done`, moves them outside `200_Projects/`, and changes their
+project index status to `archived`.
 
 ### Task notes
 

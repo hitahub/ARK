@@ -1,6 +1,6 @@
 # Roadmap (exploratory)
 
-The CLI currently supports `init`, `verify`, `health`, and `update`. Roadmap items
+The CLI currently supports `init`, `verify`, `health`, `update`, and `archive`. Roadmap items
 below distinguish available repository capabilities from future ideas. Each
 future direction needs feasibility, security, and requirements review before
 implementation commitments are made.
@@ -37,7 +37,13 @@ Explore an offline embedding workflow that suggests related Slipbox notes, poten
 
 ## 5. Project lifecycle automation
 
-Consider an `arc archive` command to move completed projects into cold storage and update project metadata. Define collision handling, rollback behavior, link updates, and confirmation requirements before implementing file moves.
+The `arc archive <project-name> [path]` command moves a project marked
+`status: done` from `200_Projects/` to `900_Archive/Projects/` and updates its
+index to `status: archived`. It previews and confirms by default, supports
+`--dry-run` and `--yes`, rejects collisions and unsafe project entries, and
+attempts rollback if the metadata update fails. User-authored path-qualified
+links are not rewritten; review them after moving. See
+[Getting started](getting-started.md#archive-behavior) for its safety contract.
 
 ## 6. Publishing selected content
 

@@ -16,7 +16,7 @@ pnpm install
 ```text
 bin/cli.mjs             Executable entry; imports the built ESM bundle
 src/cli/index.ts                  Commander program and error handling
-src/cli/commands/                 CLI command implementations
+src/cli/commands/                 CLI command implementations, including archive
 src/cli/templates/                Markdown/Templater strings and scaffold registry
 src/cli/utils/                    Filesystem and logging helpers
 src/obsidian-plugin/               Obsidian entry point, templates, and diagnostics
@@ -52,6 +52,9 @@ The plugin build derives its manifest version from the root `package.json`, whic
 Verification checks the required directory/file baseline and checks direct entries in `300_Slipbox/` for directories, including symlinks to directories. It allows user content elsewhere. It is a structural check only, not a Markdown/frontmatter or Dataview validator.
 
 `health` adds a best-effort local-link scan and inbound-link heuristic for notes in ARC content layers; it also reports `verify` findings. It is read-only and intentionally does not parse Markdown syntax or validate headings and metadata. `update` previews all scaffold additions and replacements, requires confirmation unless `--yes` is supplied, backs up replaced files under `.arc-backups/`, and leaves unchanged files and symlinks alone.
+`archive` moves a project marked `status: done` into `900_Archive/Projects/`,
+changes its index status to `archived`, rejects collisions and unsafe entries,
+and rolls the move back if updating metadata fails.
 
 ## Useful commands
 
@@ -87,6 +90,7 @@ Tests use Vitest and run against temporary directories. The current suite covers
 - verify baseline failures, allowed user content, flat Slipbox enforcement, and directory symlinks;
 - health findings for broken links, orphans, and structural issues;
 - update confirmation, backups, and symlink preservation.
+- archive previews, confirmation, collisions, metadata, unsafe entries, and rollback;
 - plugin installation by default, opt-out, dry-run, collision preservation, and symlink safety.
 
 Run all tests with `pnpm test`.
@@ -102,6 +106,9 @@ To publish, first confirm npm organization permissions, registry configuration, 
 The GitHub Actions workflow in `.github/workflows/ci.yml` uses Node.js 20 and
 pnpm, installs from the frozen lockfile, then runs formatting checks, tests,
 typecheck, and both CLI and plugin builds.
+It also validates each commit subject in the push or pull request and the pull
+request title against the ruleset documented in
+[Contributing](../CONTRIBUTING.md).
 
 ## Code and documentation guidance
 

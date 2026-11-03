@@ -78,6 +78,20 @@ describe('CLI routing', () => {
     expect(update).toHaveBeenCalledWith('./vault', { yes: true });
   });
 
+  it('routes archive with preview and confirmation options', async () => {
+    const archive = vi.fn().mockResolvedValue({
+      source: '/vault/200_Projects/Project',
+      destination: '/vault/900_Archive/Projects/Project',
+      archived: false,
+      dryRun: true,
+    });
+    const program = createProgram({ archive }).exitOverride();
+
+    await program.parseAsync(['node', 'arc', 'archive', 'Project', './vault', '--dry-run']);
+
+    expect(archive).toHaveBeenCalledWith('Project', './vault', { dryRun: true });
+  });
+
   it('registers a version option', () => {
     const program = createProgram();
 

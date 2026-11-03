@@ -22,6 +22,8 @@ Vault/
 │   │   ├── Past_Phases_Archive/
 │   │   └── Phase_03_Active/
 │   └── 220_Project_B/
+├── 900_Archive/
+│   └── Projects/                  # created by `arc archive`, not by `arc init`
 ├── 300_Slipbox/
 ├── 400_Journal/
 │   └── <current-local-year>/
@@ -55,6 +57,7 @@ be enabled in Obsidian's settings.
 | `200_Projects/`                               | Bounded initiatives with a desired outcome. A project may have an index note, phases, task notes, and project-specific checklists. Example project folders are starter content and can be renamed, replaced, or removed. |
 | `200_Projects/<project>/Phase_*`              | Optional organization for active work by phase, sprint, or another useful stage. The names and numbering are user-defined.                                                                                               |
 | `200_Projects/<project>/Past_Phases_Archive/` | Optional place for completed phases. Moving content here and updating project links/status are manual actions.                                                                                                           |
+| `900_Archive/Projects/<project>/`             | Cold storage created by `arc archive` for completed projects; this folder is not part of the `arc init` baseline.                                                                                                        |
 | `300_Slipbox/`                                | Flat collection of reusable concept and technical notes. Keep each note directly in this folder and connect related concepts with descriptive wikilinks. No direct child directories are allowed by `arc verify`.        |
 | `400_Journal/<year>/`                         | Time-ordered records such as daily journals, meetings, and reviews. Initialization creates the current local calendar-year directory; later years are created by the user.                                               |
 | `999_Templates/`                              | Markdown template sources for Templater. The CLI creates them but does not install, configure, or invoke Templater.                                                                                                      |
@@ -111,3 +114,8 @@ Verification checks for presence and basic file/directory types. It does not val
 The installed ARC plugin is also preserved unless its manifest version differs
 from the CLI bundle and the user confirms an update; replaced plugin assets are
 backed up under `.arc-backups/`.
+
+`arc archive` moves a project marked `status: done` from `200_Projects/` to
+`900_Archive/Projects/` and changes its index status to `archived`. Archived
+projects are outside the generated Dashboard queries and are not required by
+`arc verify`.
