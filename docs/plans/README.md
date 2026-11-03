@@ -21,3 +21,4 @@ Plan files use this naming convention:
 | [03.technical-review-roadmap-plugin-installation.plan.md](./03.technical-review-roadmap-plugin-installation.plan.md) | Current technical review, implementation roadmap, and automatic plugin installation. |
 | [04.project-lifecycle-automation.plan.md](./04.project-lifecycle-automation.plan.md)                                 | Implemented safe project archiving and lifecycle automation.                         |
 | [05.git-hook-integration.plan.md](./05.git-hook-integration.plan.md)                                                 | Implemented opt-in integration between `arc health` and Git commits.                 |
+| [06.arc-aware-mcp-server.plan.md](./06.arc-aware-mcp-server.plan.md)                                                 | Proposed plan for an optional, read-only ARC-aware MCP server.                       |
