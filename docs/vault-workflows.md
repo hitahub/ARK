@@ -40,6 +40,22 @@ directories there.
 The Dashboard can list active project notes, open task notes, and unchecked
 Markdown tasks. It does not create projects, assign tasks, or update statuses.
 
+## Archive a completed project
+
+1. Set the project index frontmatter to `status: done`.
+2. Preview the move with `arc archive "Project Alpha" ./MyVault --dry-run`.
+3. Run `arc archive "Project Alpha" ./MyVault` and confirm, or add `--yes` for
+   non-interactive use.
+4. ARC moves the complete project folder to
+   `900_Archive/Projects/Project Alpha/` and changes its index status to
+   `archived`. Existing destinations are never overwritten.
+5. Review any path-qualified links to the old location; ARC preserves note
+   contents rather than rewriting user-authored links.
+
+The generated Dashboard queries read project and task notes under
+`200_Projects/`, so archived projects no longer appear in active project,
+task-note, or action-item views.
+
 ## Record a day or meeting
 
 1. Create a note under `400_Journal/<year>/` using `TPL_Daily_Journal.md` for

@@ -13,7 +13,13 @@ Please report security vulnerabilities using the process in [SECURITY.md](SECURI
 - Check existing issues and pull requests for related work.
 - Keep contributions focused. Avoid bundling unrelated cleanup with a feature or fix.
 
-There is currently no required issue template, branch naming scheme, commit message format, CLA, or DCO process. Follow any instructions added to the repository in the future.
+There is currently no required issue template, branch naming scheme, CLA, or
+DCO process. Pull request titles and commit subjects must match this
+Conventional Commits ruleset; CI validates both:
+
+```regex
+^(build|chore|ci|docs|feat|fix|perf|refactor|revert|style|test){1}(\([\w\-\.]+\))?(!)?: ([\w ])+([\s\S]*)
+```
 
 ## Set up the project
 
@@ -80,7 +86,9 @@ When opening a pull request:
 4. Link the related issue or discussion, if one exists.
 5. Include screenshots only when they help explain a visual change.
 
-Keep the pull request focused and respond to review feedback with follow-up commits. Do not force-push or rewrite shared history unless repository maintainers explicitly request it.
+Keep the pull request focused and respond to review feedback with follow-up
+commits that follow the same message ruleset. Do not force-push or rewrite
+shared history unless repository maintainers explicitly request it.
 
 ## Documentation and release scope
 

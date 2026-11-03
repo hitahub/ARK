@@ -11,6 +11,7 @@ npx @hitahub/arc init ./MyNewVault
 npx @hitahub/arc verify ./MyNewVault
 npx @hitahub/arc health ./MyNewVault
 npx @hitahub/arc update ./MyNewVault
+npx @hitahub/arc archive "Project Alpha" ./MyNewVault --dry-run
 ```
 
 Or with pnpm:
@@ -20,6 +21,7 @@ pnpm dlx @hitahub/arc init ./MyNewVault
 pnpm dlx @hitahub/arc verify ./MyNewVault
 pnpm dlx @hitahub/arc health ./MyNewVault
 pnpm dlx @hitahub/arc update ./MyNewVault
+pnpm dlx @hitahub/arc archive "Project Alpha" ./MyNewVault --dry-run
 ```
 
 Use `arc init` without a path to scaffold the current directory after confirming. Initialization creates missing files and preserves existing ones, except for an ARC plugin update explicitly confirmed by the user.
@@ -27,6 +29,10 @@ Use `arc init` without a path to scaffold the current directory after confirming
 `init` and `update` support `--dry-run` to preview changes. `update --yes` applies
 the preview without prompting; changed scaffold files are backed up under
 `.arc-backups/` before replacement.
+
+`archive` previews and confirms moving a project marked `status: done` from
+`200_Projects/` to `900_Archive/Projects/`. It updates the project index to
+`status: archived`; use `--yes` for non-interactive use.
 
 `init` also installs the ARC Obsidian companion plugin by default into
 `.obsidian/plugins/arc-obsidian-plugin/`. Use `--no-plugin` to skip it. Existing
@@ -58,10 +64,10 @@ still requires enabling the plugin in its settings.
 
 ## Project status
 
-The CLI provides `init`, `verify`, report-only `health`, and confirmed `update`
-commands. The ARC Obsidian companion is installed by `init` by default and can
-be skipped with `--no-plugin`; MCP services, semantic linking, archive
-automation, and publishing integrations remain future explorations.
+The CLI provides `init`, `verify`, report-only `health`, confirmed `update`,
+and safe project `archive` commands. The ARC Obsidian companion is installed
+by `init` by default and can be skipped with `--no-plugin`; MCP services,
+semantic linking, and publishing integrations remain future explorations.
 
 ## License
 

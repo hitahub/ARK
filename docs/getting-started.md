@@ -25,6 +25,7 @@ npx @hitahub/arc verify
 npx @hitahub/arc verify ./MyNewVault
 npx @hitahub/arc health ./MyNewVault
 npx @hitahub/arc update ./MyNewVault
+npx @hitahub/arc archive "Project Alpha" ./MyNewVault --dry-run
 npx @hitahub/arc init ./PreviewVault --dry-run
 npx @hitahub/arc update ./MyNewVault --dry-run
 ```
@@ -39,6 +40,7 @@ pnpm dlx @hitahub/arc verify
 pnpm dlx @hitahub/arc verify ./MyNewVault
 pnpm dlx @hitahub/arc health ./MyNewVault
 pnpm dlx @hitahub/arc update ./MyNewVault
+pnpm dlx @hitahub/arc archive "Project Alpha" ./MyNewVault --dry-run
 ```
 
 If installed globally, invoke the binary directly:
@@ -49,6 +51,7 @@ arc init ./MyNewVault
 arc verify ./MyNewVault
 arc health ./MyNewVault
 arc update ./MyNewVault
+arc archive "Project Alpha" ./MyNewVault --dry-run
 ```
 
 ## Run from a checkout
@@ -93,6 +96,24 @@ Additional user folders and files are allowed. The example project is scaffolded
 ## `update` behavior
 
 `arc update [path]` previews scaffold files that would be added or replaced and asks for confirmation (default: no). Replaced files are backed up under `.arc-backups/<timestamp>/` before updating; identical files remain untouched and symlinked scaffold files are preserved. `--yes` accepts the displayed preview for non-interactive use, while `--dry-run` prints it without prompting or writing.
+
+## `archive` behavior
+
+`arc archive <project-name> [path]` moves the matching direct child of
+`200_Projects/` to `900_Archive/Projects/<project-name>/`. The project must
+contain exactly one Markdown note with `type: project` and `status: done`.
+Archiving changes only that note's status to `archived`; other files and note
+contents are preserved. The CLI previews the move and asks for confirmation
+(default: no). Use `--dry-run` to preview without prompting or writing, or
+`--yes` to confirm non-interactively.
+
+An existing destination is never overwritten. The CLI rejects symlinks and
+special files anywhere inside the project, as well as symlinked archive
+directories. If metadata cannot be updated after the move, ARC attempts to move
+the project back; an incomplete rollback is reported explicitly. Project
+contents are not rewritten to update path-qualified links, so review those
+references after moving; basename wikilinks and links between files inside the
+project retain their existing content.
 
 ## Troubleshooting
 

@@ -47,9 +47,9 @@ Dashboard ──queries metadata and checkboxes from──> projects and journal
 ```
 
 This is a suggested workflow, not an automated pipeline. Users decide when an
-idea is ready to become a concept, which project owns a task, and when to
-archive completed work. ARC CLI only scaffolds files and checks a limited
-structural baseline; it does not move notes, create links, or manage lifecycle.
+idea is ready to become a concept and which project owns a task. `arc archive`
+can move a completed project into cold storage; ARC CLI otherwise scaffolds
+files and checks a limited structural baseline. It does not create links.
 
 ## Note types and connections
 
@@ -105,7 +105,9 @@ Neither command validates Dataview results or Obsidian plugin settings.
 `arc update` previews scaffold changes and, after confirmation, backs up
 replaced files before updating them. See
 [Vault structure](vault-structure.md#what-verification-requires) for the exact
-requirements.
+requirements. `arc archive` moves a project marked `status: done` to
+`900_Archive/Projects/`, changes its index to `status: archived`, and keeps
+archived work outside the generated Dashboard queries.
 
 ## Design principles
 
