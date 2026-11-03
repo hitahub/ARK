@@ -20,3 +20,4 @@ Plan files use this naming convention:
 | [02.recent-changes-review.plan.md](./02.recent-changes-review.plan.md)                                               | Review of the plugin introduction changes.                                           |
 | [03.technical-review-roadmap-plugin-installation.plan.md](./03.technical-review-roadmap-plugin-installation.plan.md) | Current technical review, implementation roadmap, and automatic plugin installation. |
 | [04.project-lifecycle-automation.plan.md](./04.project-lifecycle-automation.plan.md)                                 | Implemented safe project archiving and lifecycle automation.                         |
+| [05.git-hook-integration.plan.md](./05.git-hook-integration.plan.md)                                                   | Proposed opt-in integration between `arc health` and Git commits.                    |
