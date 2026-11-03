@@ -62,4 +62,9 @@ links are not rewritten; review them after moving. See
 
 ## 6. Publishing selected content
 
-Explore exporting explicitly selected workspaces to static sites or publishing platforms. Privacy-sensitive metadata, excluded folders, and preview/review workflows would need to be specified first.
+`arc publish <vault-path> <selection...> --output <directory>` previews and
+exports explicitly selected Markdown files or directories to a new local
+review directory. It supports repeatable exclusions, omits protected ARC
+folders, removes YAML frontmatter, and rejects private or ambiguous privacy
+metadata. Remote publication and synchronization remain out of scope. See
+[Getting started](getting-started.md#publish-behavior) for its safety contract.

@@ -88,6 +88,37 @@ describe('CLI routing', () => {
     expect(suggestLinks).toHaveBeenCalledWith('/vault');
   });
 
+  it('routes publish selections, output, exclusions, and preview options', async () => {
+    const publish = vi.fn().mockResolvedValue({
+      vaultPath: '/vault',
+      outputPath: '/exports/review',
+      included: ['200_Projects/Project.md'],
+      excluded: [],
+      published: false,
+      dryRun: true,
+    });
+    const program = createProgram({ publish }).exitOverride();
+
+    await program.parseAsync([
+      'node',
+      'arc',
+      'publish',
+      '/vault',
+      '200_Projects/Project.md',
+      '--output',
+      '/exports/review',
+      '--exclude',
+      '200_Projects/private',
+      '--dry-run',
+    ]);
+
+    expect(publish).toHaveBeenCalledWith('/vault', ['200_Projects/Project.md'], {
+      outputPath: '/exports/review',
+      exclude: ['200_Projects/private'],
+      dryRun: true,
+    });
+  });
+
   it('routes update with explicit non-interactive confirmation', async () => {
     const update = vi.fn().mockResolvedValue({
       updated: [],

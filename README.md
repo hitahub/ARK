@@ -13,6 +13,7 @@ npx @hitahub/arc health ./MyNewVault
 npx @hitahub/arc update ./MyNewVault
 npx @hitahub/arc archive "Project Alpha" ./MyNewVault --dry-run
 npx @hitahub/arc links suggest ./MyNewVault
+npx @hitahub/arc publish ./MyNewVault 200_Projects/ProjectA --output ./publish-review --dry-run
 npx @hitahub/arc mcp /absolute/path/to/your/vault
 ```
 
@@ -31,6 +32,7 @@ pnpm dlx @hitahub/arc update ./MyNewVault
 pnpm dlx @hitahub/arc archive "Project Alpha" ./MyNewVault --dry-run
 pnpm dlx @hitahub/arc hook install ./MyNewVault --repo . --dry-run
 pnpm dlx @hitahub/arc links suggest ./MyNewVault
+pnpm dlx @hitahub/arc publish ./MyNewVault 200_Projects/ProjectA --output ./publish-review --dry-run
 pnpm dlx @hitahub/arc mcp /absolute/path/to/your/vault
 ```
 
@@ -55,6 +57,16 @@ still requires enabling the plugin in its settings.
 notes in `300_Slipbox/`. It requires an explicit vault path, uses no model or
 network service, and never modifies notes. Review suggestions manually; the
 ranking is heuristic, not evidence that two notes are related.
+
+`publish` exports explicitly selected Markdown files or directories to a new
+local output directory. It previews the exact notes, excludes hidden content,
+Obsidian settings, templates, archives, and `Past_Phases_Archive` directories,
+and accepts additional vault-relative `--exclude` paths. It removes all YAML
+frontmatter, rejects notes marked private/sensitive or with ambiguous privacy
+metadata, and never writes inside the source vault. Use `--dry-run` to preview
+without prompting or `--yes` to accept the preview non-interactively; otherwise
+the command asks before writing. Review exported note bodies before sharing:
+the command does not detect sensitive prose, upload files, or publish remotely.
 
 ## Documentation
 
@@ -82,10 +94,10 @@ ranking is heuristic, not evidence that two notes are related.
 
 The CLI provides `init`, `verify`, report-only `health`, confirmed `update`,
 safe project `archive`, explicit opt-in Git hook commands, an opt-in read-only
-MCP server, and local Slipbox link suggestions. The ARC Obsidian companion is
-installed by `init` by default and can be skipped with `--no-plugin`;
-embedding-based matching and publishing integrations remain future
-explorations.
+MCP server, local Slipbox link suggestions, and local export of explicitly
+selected Markdown content. The ARC Obsidian companion is installed by `init`
+by default and can be skipped with `--no-plugin`; remote publishing and
+synchronization remain out of scope.
 
 ## License
 
