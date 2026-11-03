@@ -22,3 +22,4 @@ Plan files use this naming convention:
 | [04.project-lifecycle-automation.plan.md](./04.project-lifecycle-automation.plan.md)                                 | Implemented safe project archiving and lifecycle automation.                         |
 | [05.git-hook-integration.plan.md](./05.git-hook-integration.plan.md)                                                 | Implemented opt-in integration between `arc health` and Git commits.                 |
 | [06.arc-aware-mcp-server.plan.md](./06.arc-aware-mcp-server.plan.md)                                                 | Implemented scope and data contract for the optional read-only MCP server.           |
+| [07.semantic-auto-link-suggestions.plan.md](./07.semantic-auto-link-suggestions.plan.md)                             | Exploratory plan for offline, reviewable Slipbox link suggestions.                   |
