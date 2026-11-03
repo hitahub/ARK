@@ -16,11 +16,12 @@ pnpm install
 ```text
 bin/cli.mjs             Executable entry; imports the built ESM bundle
 src/cli/index.ts                  Commander program and error handling
-src/cli/commands/                 CLI command implementations, including archive
+src/cli/commands/                 CLI commands, including archive and the MCP server
 src/cli/templates/                Markdown/Templater strings and scaffold registry
 src/cli/utils/                    Filesystem and logging helpers
 src/obsidian-plugin/               Obsidian entry point, templates, and diagnostics
 tests/cli/                         CLI unit and integration tests
+tests/cli/commands/mcp.test.ts     MCP protocol and filesystem-boundary tests
 tests/obsidian-plugin/             Plugin logic unit tests
 scripts/build-obsidian-plugin.mjs  Produces files for local install/community release
 ```
@@ -58,6 +59,11 @@ and rolls the move back if updating metadata fails.
 `hook install` and `hook uninstall` explicitly manage an ARC-owned pre-commit
 hook. The hook invokes the existing report-only health command for a resolved
 vault path and never replaces an existing hook or custom `core.hooksPath`.
+`mcp` starts an opt-in stdio MCP server for an explicitly selected vault. Its
+read-only tools expose active project index metadata and direct Slipbox notes;
+path validation, YAML parsing, and response/scan limits are implemented in
+`src/cli/commands/mcp.ts`. See [ARC MCP server](mcp-server.md) for the public
+tool contract and limitations.
 
 ## Useful commands
 
@@ -80,6 +86,7 @@ node bin/cli.mjs init ./MyNewVault
 node bin/cli.mjs verify ./MyNewVault
 node bin/cli.mjs health ./MyNewVault
 node bin/cli.mjs update ./MyNewVault
+node bin/cli.mjs mcp /absolute/path/to/your/vault
 ```
 
 ## Tests
@@ -96,6 +103,8 @@ Tests use Vitest and run against temporary directories. The current suite covers
 - archive previews, confirmation, collisions, metadata, unsafe entries, and rollback;
 - Git hook preview, idempotent install/removal, conflicts, non-Git paths,
   symlink safety, and linked worktrees;
+- MCP tool schemas and results, metadata errors, content and result limits,
+  vault-relative path boundaries, symlink rejection, and read-only behavior;
 - plugin installation by default, opt-out, dry-run, collision preservation, and symlink safety.
 
 Run all tests with `pnpm test`.

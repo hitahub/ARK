@@ -6,6 +6,7 @@ import { inspectVaultHealth, reportHealth } from './commands/health.js';
 import { updateVault, type UpdateOptions } from './commands/update.js';
 import { archiveProject, type ArchiveOptions } from './commands/archive.js';
 import { installGitHook, uninstallGitHook, type GitHookOptions } from './commands/hook.js';
+import { startMcpServer } from './commands/mcp.js';
 import { logger } from './utils/logger.js';
 
 // Read the package version so the --version flag stays aligned with published metadata.
@@ -20,6 +21,7 @@ export interface CliDependencies {
   archive?: typeof archiveProject;
   installHook?: typeof installGitHook;
   uninstallHook?: typeof uninstallGitHook;
+  mcp?: typeof startMcpServer;
   initOptions?: InitOptions;
   updateOptions?: UpdateOptions;
   archiveOptions?: ArchiveOptions;
@@ -41,6 +43,7 @@ export function createProgram(dependencies: CliDependencies = {}): Command {
   const archive = dependencies.archive ?? archiveProject;
   const installHook = dependencies.installHook ?? installGitHook;
   const uninstallHook = dependencies.uninstallHook ?? uninstallGitHook;
+  const mcp = dependencies.mcp ?? startMcpServer;
 
   program
     .name('arc')
@@ -90,6 +93,14 @@ export function createProgram(dependencies: CliDependencies = {}): Command {
       const result = await health(targetPath);
       reportHealth(result, targetPath);
       if (!result.healthy) process.exitCode = 1;
+    });
+
+  program
+    .command('mcp')
+    .description('Start the opt-in, read-only ARC MCP server')
+    .argument('<vault-path>', 'explicit vault directory to expose to MCP tools')
+    .action(async (vaultPath: string) => {
+      await mcp(vaultPath);
     });
 
   program

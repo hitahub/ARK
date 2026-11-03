@@ -65,6 +65,15 @@ describe('CLI routing', () => {
     expect(process.exitCode).toBe(1);
   });
 
+  it('routes the explicitly selected vault to the MCP server', async () => {
+    const mcp = vi.fn().mockResolvedValue(undefined);
+    const program = createProgram({ mcp }).exitOverride();
+
+    await program.parseAsync(['node', 'arc', 'mcp', '/vault']);
+
+    expect(mcp).toHaveBeenCalledWith('/vault');
+  });
+
   it('routes update with explicit non-interactive confirmation', async () => {
     const update = vi.fn().mockResolvedValue({
       updated: [],
