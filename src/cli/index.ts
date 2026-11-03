@@ -8,6 +8,7 @@ import { archiveProject, type ArchiveOptions } from './commands/archive.js';
 import { installGitHook, uninstallGitHook, type GitHookOptions } from './commands/hook.js';
 import { startMcpServer } from './commands/mcp.js';
 import { reportLinkSuggestions, suggestRelatedNotes } from './commands/links.js';
+import { publishSelectedContent, type PublishOptions } from './commands/publish.js';
 import { logger } from './utils/logger.js';
 
 // Read the package version so the --version flag stays aligned with published metadata.
@@ -24,10 +25,12 @@ export interface CliDependencies {
   uninstallHook?: typeof uninstallGitHook;
   mcp?: typeof startMcpServer;
   suggestLinks?: typeof suggestRelatedNotes;
+  publish?: typeof publishSelectedContent;
   initOptions?: InitOptions;
   updateOptions?: UpdateOptions;
   archiveOptions?: ArchiveOptions;
   gitHookOptions?: GitHookOptions;
+  publishOptions?: Omit<PublishOptions, 'outputPath'>;
 }
 
 /**
@@ -47,6 +50,7 @@ export function createProgram(dependencies: CliDependencies = {}): Command {
   const uninstallHook = dependencies.uninstallHook ?? uninstallGitHook;
   const mcp = dependencies.mcp ?? startMcpServer;
   const suggestLinks = dependencies.suggestLinks ?? suggestRelatedNotes;
+  const publish = dependencies.publish ?? publishSelectedContent;
 
   program
     .name('arc')
@@ -116,6 +120,36 @@ export function createProgram(dependencies: CliDependencies = {}): Command {
       const result = await suggestLinks(vaultPath);
       reportLinkSuggestions(result);
     });
+
+  program
+    .command('publish')
+    .description('Preview and export explicitly selected Markdown content locally')
+    .argument('<vault-path>', 'source vault directory')
+    .argument('<selection...>', 'vault-relative Markdown files or directories to include')
+    .requiredOption('--output <path>', 'new output directory outside the source vault')
+    .option(
+      '--exclude <path>',
+      'vault-relative file or directory to exclude; may be repeated',
+      (value: string, previous: string[]) => [...previous, value],
+      [],
+    )
+    .option('--dry-run', 'preview the export without writing files')
+    .option('--yes', 'write the reviewed export without prompting')
+    .action(
+      async (
+        vaultPath: string,
+        selections: string[],
+        commandOptions: { output: string; exclude: string[]; dryRun?: boolean; yes?: boolean },
+      ) => {
+        await publish(vaultPath, selections, {
+          ...dependencies.publishOptions,
+          outputPath: commandOptions.output,
+          exclude: commandOptions.exclude,
+          ...(commandOptions.dryRun ? { dryRun: true } : {}),
+          ...(commandOptions.yes ? { yes: true } : {}),
+        });
+      },
+    );
 
   program
     .command('update')

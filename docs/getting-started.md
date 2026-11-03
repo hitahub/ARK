@@ -27,6 +27,7 @@ npx @hitahub/arc health ./MyNewVault
 npx @hitahub/arc update ./MyNewVault
 npx @hitahub/arc archive "Project Alpha" ./MyNewVault --dry-run
 npx @hitahub/arc links suggest ./MyNewVault
+npx @hitahub/arc publish ./MyNewVault 200_Projects/ProjectA --output ./publish-review --dry-run
 npx @hitahub/arc hook install ./MyNewVault --repo . --dry-run
 npx @hitahub/arc init ./PreviewVault --dry-run
 npx @hitahub/arc update ./MyNewVault --dry-run
@@ -44,6 +45,7 @@ pnpm dlx @hitahub/arc health ./MyNewVault
 pnpm dlx @hitahub/arc update ./MyNewVault
 pnpm dlx @hitahub/arc archive "Project Alpha" ./MyNewVault --dry-run
 pnpm dlx @hitahub/arc links suggest ./MyNewVault
+pnpm dlx @hitahub/arc publish ./MyNewVault 200_Projects/ProjectA --output ./publish-review --dry-run
 pnpm dlx @hitahub/arc hook install ./MyNewVault --repo . --dry-run
 ```
 
@@ -57,6 +59,7 @@ arc health ./MyNewVault
 arc update ./MyNewVault
 arc archive "Project Alpha" ./MyNewVault --dry-run
 arc links suggest ./MyNewVault
+arc publish ./MyNewVault 200_Projects/ProjectA --output ./publish-review --dry-run
 ```
 
 ## Run from a checkout
@@ -71,6 +74,7 @@ node bin/cli.mjs verify ./MyNewVault
 node bin/cli.mjs health ./MyNewVault
 node bin/cli.mjs update ./MyNewVault
 node bin/cli.mjs links suggest ./MyNewVault
+node bin/cli.mjs publish ./MyNewVault 200_Projects/ProjectA --output ./publish-review --dry-run
 ```
 
 The package is not downloaded from the registry when using `node bin/cli.mjs`.
@@ -172,6 +176,31 @@ the project back; an incomplete rollback is reported explicitly. Project
 contents are not rewritten to update path-qualified links, so review those
 references after moving; basename wikilinks and links between files inside the
 project retain their existing content.
+
+## `publish` behavior
+
+`arc publish <vault-path> <selection...> --output <directory>` exports only
+explicitly selected vault-relative Markdown files or directories. A directory
+selection recursively includes Markdown notes while preserving their
+vault-relative paths. The output directory must not already exist, must be
+outside the source vault, and its parent must already exist. The command
+previews the complete include/exclude list before asking for confirmation;
+`--dry-run` previews without writing, and `--yes` accepts the preview without
+prompting.
+
+Use `--exclude <vault-relative-path>` one or more times to omit selected files
+or folders. Hidden paths, `.obsidian/`, `.git/`, `.arc-backups/`,
+`900_Archive/`, `999_Templates/`, and `Past_Phases_Archive/` are excluded
+automatically. Symlinks and special files in selected content are rejected.
+Exports contain Markdown bodies only: all YAML frontmatter is removed. Notes
+marked `private`, `sensitive`, `secret`, or `confidential`, with `publish: false`,
+with private/restricted visibility or classification, or with a
+privacy-sensitive tag are rejected; ambiguous values also fail closed. The source vault is
+read-only, and failed output writes are rolled back.
+
+The export is a local review artifact, not a publisher or secret scanner.
+Review the note bodies and links before sharing: prose and embedded media are
+not classified, and no remote service is contacted.
 
 ## Troubleshooting
 
