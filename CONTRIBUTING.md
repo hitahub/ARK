@@ -61,7 +61,24 @@ Use a descriptive branch name appropriate to the change; the example above is no
 - Keep future or experimental ideas clearly distinguished from implemented features.
 - Do not add credentials, tokens, private keys, or other secrets to the repository.
 
-For an overview of the codebase and implementation flows, see [`docs/development.md`](docs/development.md). For CLI and vault behavior, see [`docs/getting-started.md`](docs/getting-started.md) and [`docs/vault-structure.md`](docs/vault-structure.md).
+## Maintain `AGENTS.md`
+
+The root [`AGENTS.md`](AGENTS.md) is a short working guide for both human
+contributors and coding agents. Keep it readable, concise, and focused on
+actionable repository-wide guidance; link to detailed docs rather than copying
+them.
+
+When changing it:
+
+- Keep architectural guidance consistent with the ARC foundation plan, while
+  treating current code and [`docs/development.md`](docs/development.md) as the
+  source of truth for implemented behavior.
+- Clearly distinguish implemented behavior from roadmap or experimental work.
+- Include only durable guidance that helps contributors make and validate
+  changes; avoid task-specific instructions and duplicated reference material.
+- Check that commands, paths, and relative Markdown links are accurate.
+
+For an overview of the codebase and implementation flows, see [ `docs/development.md`](docs/development.md). For CLI and vault behavior, see [`docs/getting-started.md`](docs/getting-started.md) and [`docs/vault-structure.md`](docs/vault-structure.md).
 
 ## Validate your work
 
