@@ -79,6 +79,7 @@ describe('CLI routing', () => {
       vaultPath: '/vault',
       noteCount: 0,
       candidates: [],
+      matcher: 'lexical',
     });
     const saveLinks = vi.fn();
     vi.spyOn(console, 'log').mockImplementation(() => undefined);
@@ -95,6 +96,7 @@ describe('CLI routing', () => {
       vaultPath: '/vault',
       noteCount: 0,
       candidates: [],
+      matcher: 'lexical' as const,
     };
     const suggestLinks = vi.fn().mockResolvedValue(result);
     const saveLinks = vi.fn().mockResolvedValue(undefined);
@@ -123,6 +125,7 @@ describe('CLI routing', () => {
       vaultPath: '/vault',
       noteCount: 0,
       candidates: [],
+      matcher: 'lexical',
     });
     const saveLinks = vi.fn().mockRejectedValue(new Error('destination exists'));
     const stdout = vi.spyOn(console, 'log').mockImplementation(() => undefined);
@@ -145,6 +148,34 @@ describe('CLI routing', () => {
     expect(stderr).not.toHaveBeenCalledWith(
       'Saved link suggestion report to /reports/suggestions.md',
     );
+  });
+
+  it('routes semantic suggestions with an explicitly selected Ollama model', async () => {
+    const suggestLinks = vi.fn().mockResolvedValue({
+      vaultPath: '/vault',
+      noteCount: 0,
+      candidates: [],
+      matcher: 'semantic',
+      model: 'nomic-embed-text:latest',
+    });
+    vi.spyOn(console, 'log').mockImplementation(() => undefined);
+    const program = createProgram({ suggestLinks }).exitOverride();
+
+    await program.parseAsync([
+      'node',
+      'arc',
+      'links',
+      'suggest',
+      '/vault',
+      '--semantic',
+      '--model',
+      'nomic-embed-text:latest',
+    ]);
+
+    expect(suggestLinks).toHaveBeenCalledWith('/vault', {
+      semantic: true,
+      model: 'nomic-embed-text:latest',
+    });
   });
 
   it('routes publish selections, output, exclusions, and preview options', async () => {

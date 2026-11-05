@@ -126,14 +126,27 @@ export function createProgram(dependencies: CliDependencies = {}): Command {
       '--output <file>',
       'save the deterministic Markdown report to a new file outside the vault',
     )
-    .action(async (vaultPath: string, commandOptions: { output?: string }) => {
-      const result = await suggestLinks(vaultPath);
-      reportLinkSuggestions(result);
-      if (commandOptions.output !== undefined) {
-        await saveLinks(result, commandOptions.output);
-        console.error(`Saved link suggestion report to ${commandOptions.output}`);
-      }
-    });
+    .option('--semantic', 'use local Ollama embeddings instead of lexical matching')
+    .option('--model <name>', 'installed local Ollama embedding model; requires --semantic')
+    .action(
+      async (
+        vaultPath: string,
+        commandOptions: { output?: string; semantic?: boolean; model?: string },
+      ) => {
+        const result =
+          commandOptions.semantic || commandOptions.model !== undefined
+            ? await suggestLinks(vaultPath, {
+                semantic: commandOptions.semantic,
+                ...(commandOptions.model !== undefined ? { model: commandOptions.model } : {}),
+              })
+            : await suggestLinks(vaultPath);
+        reportLinkSuggestions(result);
+        if (commandOptions.output !== undefined) {
+          await saveLinks(result, commandOptions.output);
+          console.error(`Saved link suggestion report to ${commandOptions.output}`);
+        }
+      },
+    );
 
   program
     .command('publish')

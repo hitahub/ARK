@@ -106,19 +106,43 @@ Additional user folders and files are allowed. The example project is scaffolded
 ## `links suggest` behavior
 
 `arc links suggest <vault-path>` requires an explicit vault directory and
-analyzes only direct, non-hidden Markdown files in `300_Slipbox/`. It uses
-deterministic local TF-IDF cosine similarity; front-matter and code blocks do
-not contribute to matching. The report shows at most 20 pairs that share at
-least two non-stopword terms and meet the minimum similarity threshold,
+analyzes only direct, non-hidden Markdown files in `300_Slipbox/`. Its default
+matcher is deterministic local TF-IDF cosine similarity; front-matter and code
+blocks do not contribute to matching. The report shows at most 20 pairs that
+share at least two non-stopword terms and meet the minimum similarity threshold,
 alongside the strongest shared terms. Scores are heuristic and do not establish
 that notes are meaningfully related. The minimum cosine similarity is 0.12.
 
 The scan is bounded to 500 notes, 64 KiB per note, 8 MiB total content, 100,000
 unique terms, 2,000 directory entries, and 1,000,000 term-pair comparisons.
 Exceeding a limit or encountering an unsafe symlink or unreadable/invalid note
-is reported as an error rather than silently truncating results. The command
-performs no network requests, model downloads, caching, or file writes. Review
-every suggestion and apply any links manually.
+is reported as an error rather than silently truncating results. The default
+lexical command performs no network requests, model downloads, caching, or file
+writes. Review every suggestion and apply any links manually.
+
+Semantic matching is optional and must be selected explicitly with an already
+installed Ollama embedding model:
+
+```bash
+ollama pull nomic-embed-text
+arc links suggest ./MyNewVault --semantic --model nomic-embed-text
+```
+
+Start Ollama locally before running the command. ARC sends the selected direct
+Slipbox note text (excluding front-matter and code) only to the fixed
+`127.0.0.1:11434` Ollama endpoint. There is no endpoint override, remote
+inference, automatic model download, or cache. The default lexical command
+remains offline.
+
+Semantic scans are bounded to 100 notes, 8,000 characters per note, and
+512,000 total semantic input characters, in addition to the general scan
+limits above. The report ranks at most 20 pairs by embedding cosine
+similarity; it does not apply the lexical matcher’s shared-term or score
+thresholds. It displays raw cosine scores, not probabilities. Scores are
+heuristic and may include unrelated pairs. If Ollama is unavailable, the model
+is missing or incompatible, or a request fails, the command reports an error
+instead of returning partial results. Semantic mode remains read-only, and
+every suggestion needs manual review.
 
 Use `--output <file>` to also save a deterministic Markdown report while
 retaining the normal stdout report:
@@ -127,13 +151,15 @@ retaining the normal stdout report:
 arc links suggest ./MyNewVault --output ../link-suggestions.md
 ```
 
-The report includes the analyzed note count, ranked candidates, similarity
-scores, and strongest shared terms. The output parent must already exist, the
-destination must not exist, and the destination must be outside the selected
-vault. Symlinked output paths are rejected; failures are reported without
-leaving a partial report. Saved reports contain no timestamp or absolute vault
-path. Suggestions remain heuristic and require manual review; no links are
-applied automatically.
+The report includes the analyzed note count, ranked candidates, and similarity
+scores; lexical results also show strongest shared terms, while semantic
+results identify the selected model and explain that scores are embedding
+cosine similarities. The output parent must already exist, the destination
+must not exist, and the destination must be outside the selected vault.
+Symlinked output paths are rejected; failures are reported without leaving a
+partial report. Saved reports contain no timestamp or absolute vault path.
+Suggestions remain heuristic and require manual review; no links are applied
+automatically.
 
 ## Git hook integration
 
