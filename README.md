@@ -57,6 +57,8 @@ still requires enabling the plugin in its settings.
 notes in `300_Slipbox/`. It requires an explicit vault path, uses no model or
 network service, and never modifies notes. Review suggestions manually; the
 ranking is heuristic, not evidence that two notes are related.
+Add `--output ../suggestions.md` to save a deterministic Markdown copy outside
+the vault; the destination must be new, and the normal stdout report remains.
 
 `publish` exports explicitly selected Markdown files or directories to a new
 local output directory. It previews the exact notes, excludes hidden content,

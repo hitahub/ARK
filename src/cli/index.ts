@@ -7,7 +7,11 @@ import { updateVault, type UpdateOptions } from './commands/update.js';
 import { archiveProject, type ArchiveOptions } from './commands/archive.js';
 import { installGitHook, uninstallGitHook, type GitHookOptions } from './commands/hook.js';
 import { startMcpServer } from './commands/mcp.js';
-import { reportLinkSuggestions, suggestRelatedNotes } from './commands/links.js';
+import {
+  reportLinkSuggestions,
+  saveLinkSuggestionReport,
+  suggestRelatedNotes,
+} from './commands/links.js';
 import { publishSelectedContent, type PublishOptions } from './commands/publish.js';
 import { logger } from './utils/logger.js';
 
@@ -25,6 +29,7 @@ export interface CliDependencies {
   uninstallHook?: typeof uninstallGitHook;
   mcp?: typeof startMcpServer;
   suggestLinks?: typeof suggestRelatedNotes;
+  saveLinks?: typeof saveLinkSuggestionReport;
   publish?: typeof publishSelectedContent;
   initOptions?: InitOptions;
   updateOptions?: UpdateOptions;
@@ -50,6 +55,7 @@ export function createProgram(dependencies: CliDependencies = {}): Command {
   const uninstallHook = dependencies.uninstallHook ?? uninstallGitHook;
   const mcp = dependencies.mcp ?? startMcpServer;
   const suggestLinks = dependencies.suggestLinks ?? suggestRelatedNotes;
+  const saveLinks = dependencies.saveLinks ?? saveLinkSuggestionReport;
   const publish = dependencies.publish ?? publishSelectedContent;
 
   program
@@ -116,9 +122,17 @@ export function createProgram(dependencies: CliDependencies = {}): Command {
     .command('suggest')
     .description('Suggest related direct Slipbox notes without editing them')
     .argument('<vault-path>', 'explicit vault directory to analyze')
-    .action(async (vaultPath: string) => {
+    .option(
+      '--output <file>',
+      'save the deterministic Markdown report to a new file outside the vault',
+    )
+    .action(async (vaultPath: string, commandOptions: { output?: string }) => {
       const result = await suggestLinks(vaultPath);
       reportLinkSuggestions(result);
+      if (commandOptions.output !== undefined) {
+        await saveLinks(result, commandOptions.output);
+        console.error(`Saved link suggestion report to ${commandOptions.output}`);
+      }
     });
 
   program

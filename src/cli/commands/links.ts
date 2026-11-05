@@ -1,3 +1,4 @@
+import { randomUUID } from 'node:crypto';
 import { constants } from 'node:fs';
 import type { Dirent, Stats } from 'node:fs';
 import fs, { type FileHandle } from 'node:fs/promises';
@@ -132,6 +133,218 @@ export function reportLinkSuggestions(result: LinkSuggestions): void {
         `(shared terms: ${candidate.sharedTerms.join(', ')})`,
     );
   }
+}
+
+/**
+ * Save a deterministic Markdown report without changing the selected vault.
+ *
+ * @param result Result returned by {@link suggestRelatedNotes}.
+ * @param outputPath Requested report path.
+ * @throws If the destination is unsafe, already exists, or cannot be written.
+ */
+export async function saveLinkSuggestionReport(
+  result: LinkSuggestions,
+  outputPath: string,
+): Promise<void> {
+  if (!outputPath.trim()) {
+    throw new LinkSuggestionError('Provide an output file for the link suggestion report.');
+  }
+  const absoluteOutputPath = path.resolve(outputPath);
+  const outputName = path.basename(absoluteOutputPath);
+  if (
+    !outputName ||
+    outputPath.endsWith(path.sep) ||
+    /[\u0000-\u001f\u007f-\u009f]/.test(outputPath)
+  ) {
+    throw new LinkSuggestionError('The report output path is not a valid file path.');
+  }
+
+  const outputDirectory = path.dirname(absoluteOutputPath);
+  const canonicalDirectory = await validateReportDestination(
+    result.vaultPath,
+    outputDirectory,
+    absoluteOutputPath,
+  );
+  const temporaryPath = path.join(canonicalDirectory, `.arc-links-${randomUUID()}.tmp`);
+  const report = formatLinkSuggestionReport(result);
+  let temporaryCreated = false;
+  let handle: FileHandle | undefined;
+  let operationError: unknown;
+  let cleanupError: unknown;
+
+  try {
+    handle = await fs.open(
+      temporaryPath,
+      constants.O_WRONLY | constants.O_CREAT | constants.O_EXCL | constants.O_NOFOLLOW,
+      0o600,
+    );
+    temporaryCreated = true;
+    await handle.writeFile(report, 'utf8');
+    await handle.sync();
+    const temporaryStats = await handle.stat();
+    await handle.close();
+    handle = undefined;
+
+    await validateReportDestination(result.vaultPath, outputDirectory, absoluteOutputPath);
+    const pathStats = await fs.lstat(temporaryPath);
+    if (
+      pathStats.isSymbolicLink() ||
+      !pathStats.isFile() ||
+      pathStats.dev !== temporaryStats.dev ||
+      pathStats.ino !== temporaryStats.ino
+    ) {
+      throw new LinkSuggestionError('The temporary report changed before it could be saved.');
+    }
+    await fs.link(temporaryPath, absoluteOutputPath);
+  } catch (error) {
+    operationError = error instanceof LinkSuggestionError ? error : outputOperationError(error);
+  } finally {
+    if (handle) {
+      try {
+        await handle.close();
+      } catch (error) {
+        cleanupError = outputOperationError(error, 'close the temporary report');
+      }
+    }
+    if (temporaryCreated) {
+      try {
+        await fs.unlink(temporaryPath);
+      } catch (error) {
+        cleanupError = combineErrors(
+          cleanupError,
+          outputOperationError(error, 'remove the temporary report'),
+        );
+      }
+    }
+  }
+
+  if (operationError || cleanupError) {
+    throw combineErrors(operationError, cleanupError);
+  }
+}
+
+function formatLinkSuggestionReport(result: LinkSuggestions): string {
+  const lines = [
+    '# ARC Slipbox link suggestions',
+    '',
+    `Notes analyzed: ${result.noteCount}`,
+    '',
+    'Heuristic lexical matches only. These suggestions require manual review and do not establish that notes are meaningfully related. No notes or links were changed.',
+    '',
+    '## Candidates',
+    '',
+  ];
+  if (result.candidates.length === 0) {
+    lines.push('No candidates met the minimum similarity and shared-term requirements.');
+  } else {
+    for (const [index, candidate] of result.candidates.entries()) {
+      lines.push(
+        `${index + 1}. **${(candidate.similarity * 100).toFixed(1)}%** ` +
+          `${markdownCode(candidate.leftPath)} <-> ${markdownCode(candidate.rightPath)}`,
+        `   - Shared terms: ${candidate.sharedTerms.join(', ')}`,
+      );
+    }
+  }
+  return `${lines.join('\n')}\n`;
+}
+
+function markdownCode(value: string): string {
+  const longestRun = Math.max(0, ...Array.from(value.matchAll(/`+/g), ([run]) => run.length));
+  const delimiter = '`'.repeat(longestRun + 1);
+  const padding = /^[` ]|[` ]$/.test(value) ? ' ' : '';
+  return `${delimiter}${padding}${value}${padding}${delimiter}`;
+}
+
+async function validateReportDestination(
+  vaultRoot: string,
+  outputDirectory: string,
+  absoluteOutputPath: string,
+): Promise<string> {
+  let directoryStats: Stats;
+  try {
+    directoryStats = await fs.lstat(outputDirectory);
+  } catch (error) {
+    throw outputOperationError(error, 'access the report directory');
+  }
+  if (directoryStats.isSymbolicLink() || !directoryStats.isDirectory()) {
+    throw new LinkSuggestionError('The report parent must be an existing, non-symlink directory.');
+  }
+
+  let canonicalDirectory: string;
+  try {
+    canonicalDirectory = await fs.realpath(outputDirectory);
+  } catch (error) {
+    throw outputOperationError(error, 'resolve the report directory');
+  }
+  if (canonicalDirectory !== path.resolve(outputDirectory)) {
+    throw new LinkSuggestionError('Symlink paths are not allowed in the report output path.');
+  }
+  const reportPath = path.join(canonicalDirectory, path.basename(absoluteOutputPath));
+  const relativePath = path.relative(vaultRoot, reportPath);
+  if (
+    relativePath === '' ||
+    (relativePath !== '..' &&
+      !relativePath.startsWith(`..${path.sep}`) &&
+      !path.isAbsolute(relativePath))
+  ) {
+    throw new LinkSuggestionError('The report output must be outside the selected vault.');
+  }
+
+  try {
+    await fs.lstat(absoluteOutputPath);
+    throw new LinkSuggestionError(
+      'The report output already exists; existing paths are never replaced.',
+    );
+  } catch (error) {
+    if (error instanceof LinkSuggestionError) throw error;
+    if (hasErrorCode(error, 'ENOENT')) return canonicalDirectory;
+    throw outputOperationError(error, 'check the report destination');
+  }
+}
+
+function outputOperationError(error: unknown, operation = 'write the report'): LinkSuggestionError {
+  if (hasErrorCode(error, 'EEXIST')) {
+    return new LinkSuggestionError(
+      'The report output already exists; existing paths are never replaced.',
+    );
+  }
+  if (hasErrorCode(error, 'ELOOP')) {
+    return new LinkSuggestionError('Symlink paths are not allowed in the report output path.');
+  }
+  if (hasErrorCode(error, 'ENOENT') || hasErrorCode(error, 'ENOTDIR')) {
+    return new LinkSuggestionError('The report output directory must already exist.');
+  }
+  if (hasErrorCode(error, 'EACCES') || hasErrorCode(error, 'EPERM')) {
+    return new LinkSuggestionError(`Permission denied while attempting to ${operation}.`);
+  }
+  const code =
+    typeof error === 'object' && error !== null && 'code' in error && typeof error.code === 'string'
+      ? error.code
+      : undefined;
+  return new LinkSuggestionError(
+    `Unable to ${operation}${code ? ` (${code})` : ''}${error instanceof Error ? `: ${error.message}` : ''}.`,
+  );
+}
+
+function hasErrorCode(error: unknown, code: string): boolean {
+  return (
+    typeof error === 'object' &&
+    error !== null &&
+    'code' in error &&
+    typeof error.code === 'string' &&
+    error.code === code
+  );
+}
+
+function combineErrors(primary: unknown, cleanup: unknown): LinkSuggestionError {
+  if (!primary && cleanup instanceof Error) {
+    return new LinkSuggestionError(`Cleanup failed: ${cleanup.message}`);
+  }
+  const message = [primary, cleanup]
+    .filter((error): error is Error => error instanceof Error)
+    .map((error) => error.message)
+    .join(' Additionally, cleanup failed: ');
+  return new LinkSuggestionError(message || 'Unable to save the link suggestion report.');
 }
 
 async function resolveVaultRoot(vaultPath: string): Promise<string> {
