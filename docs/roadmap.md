@@ -49,9 +49,10 @@ read-only; users review and apply any links themselves. Embedding-based
 matching and caching remain exploratory follow-ups, not current behavior. The
 optional `--output` report feature is implemented; see the
 [saved link-suggestion reports plan](plans/09.saving-link-suggestion-reports.plan.md).
-An evaluation proposal for optional local semantic matching is documented in
-the [semantic matching plan](plans/10.evaluating-semantic-link-matching.plan.md);
-no model or implementation approach has been approved.
+A limited synthetic evaluation with a local embedding model showed higher
+top-five and top-ten recall than the lexical baseline. This is not sufficient
+evidence to approve implementation; see the
+[semantic matching evaluation](plans/10.evaluating-semantic-link-matching.plan.md).
 See [Getting started](getting-started.md#links-suggest-behavior) for its
 limits.
 
