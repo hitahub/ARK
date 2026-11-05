@@ -80,12 +80,71 @@ describe('CLI routing', () => {
       noteCount: 0,
       candidates: [],
     });
+    const saveLinks = vi.fn();
     vi.spyOn(console, 'log').mockImplementation(() => undefined);
-    const program = createProgram({ suggestLinks }).exitOverride();
+    const program = createProgram({ suggestLinks, saveLinks }).exitOverride();
 
     await program.parseAsync(['node', 'arc', 'links', 'suggest', '/vault']);
 
     expect(suggestLinks).toHaveBeenCalledWith('/vault');
+    expect(saveLinks).not.toHaveBeenCalled();
+  });
+
+  it('saves link suggestions when an output file is requested', async () => {
+    const result = {
+      vaultPath: '/vault',
+      noteCount: 0,
+      candidates: [],
+    };
+    const suggestLinks = vi.fn().mockResolvedValue(result);
+    const saveLinks = vi.fn().mockResolvedValue(undefined);
+    const stdout = vi.spyOn(console, 'log').mockImplementation(() => undefined);
+    const stderr = vi.spyOn(console, 'error').mockImplementation(() => undefined);
+    const program = createProgram({ suggestLinks, saveLinks }).exitOverride();
+
+    await program.parseAsync([
+      'node',
+      'arc',
+      'links',
+      'suggest',
+      '/vault',
+      '--output',
+      '/reports/suggestions.md',
+    ]);
+
+    expect(suggestLinks).toHaveBeenCalledWith('/vault');
+    expect(saveLinks).toHaveBeenCalledWith(result, '/reports/suggestions.md');
+    expect(stdout).toHaveBeenCalledWith('ARC Slipbox link suggestions (0 notes): /vault');
+    expect(stderr).toHaveBeenCalledWith('Saved link suggestion report to /reports/suggestions.md');
+  });
+
+  it('reports the stdout results but does not hide a requested save failure', async () => {
+    const suggestLinks = vi.fn().mockResolvedValue({
+      vaultPath: '/vault',
+      noteCount: 0,
+      candidates: [],
+    });
+    const saveLinks = vi.fn().mockRejectedValue(new Error('destination exists'));
+    const stdout = vi.spyOn(console, 'log').mockImplementation(() => undefined);
+    const stderr = vi.spyOn(console, 'error').mockImplementation(() => undefined);
+    const program = createProgram({ suggestLinks, saveLinks }).exitOverride();
+
+    await expect(
+      program.parseAsync([
+        'node',
+        'arc',
+        'links',
+        'suggest',
+        '/vault',
+        '--output',
+        '/reports/suggestions.md',
+      ]),
+    ).rejects.toThrow('destination exists');
+
+    expect(stdout).toHaveBeenCalledWith('ARC Slipbox link suggestions (0 notes): /vault');
+    expect(stderr).not.toHaveBeenCalledWith(
+      'Saved link suggestion report to /reports/suggestions.md',
+    );
   });
 
   it('routes publish selections, output, exclusions, and preview options', async () => {

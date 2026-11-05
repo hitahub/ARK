@@ -120,6 +120,21 @@ is reported as an error rather than silently truncating results. The command
 performs no network requests, model downloads, caching, or file writes. Review
 every suggestion and apply any links manually.
 
+Use `--output <file>` to also save a deterministic Markdown report while
+retaining the normal stdout report:
+
+```bash
+arc links suggest ./MyNewVault --output ../link-suggestions.md
+```
+
+The report includes the analyzed note count, ranked candidates, similarity
+scores, and strongest shared terms. The output parent must already exist, the
+destination must not exist, and the destination must be outside the selected
+vault. Symlinked output paths are rejected; failures are reported without
+leaving a partial report. Saved reports contain no timestamp or absolute vault
+path. Suggestions remain heuristic and require manual review; no links are
+applied automatically.
+
 ## Git hook integration
 
 ARC can run its existing `health` checks before commits through an explicitly

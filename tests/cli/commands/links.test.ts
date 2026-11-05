@@ -2,7 +2,11 @@ import fs from 'node:fs/promises';
 import os from 'node:os';
 import path from 'node:path';
 import { afterEach, describe, expect, it, vi } from 'vitest';
-import { reportLinkSuggestions, suggestRelatedNotes } from '../../../src/cli/commands/links.js';
+import {
+  reportLinkSuggestions,
+  saveLinkSuggestionReport,
+  suggestRelatedNotes,
+} from '../../../src/cli/commands/links.js';
 
 const temporaryDirectories: string[] = [];
 
@@ -10,7 +14,7 @@ async function createVault(): Promise<string> {
   const vault = await fs.mkdtemp(path.join(os.tmpdir(), 'arc-links-'));
   temporaryDirectories.push(vault);
   await fs.mkdir(path.join(vault, '300_Slipbox'));
-  return vault;
+  return fs.realpath(vault);
 }
 
 afterEach(async () => {
@@ -169,5 +173,159 @@ describe('suggestRelatedNotes', () => {
     expect(output).toHaveBeenCalledWith(
       expect.stringContaining('No candidates met the minimum similarity'),
     );
+  });
+});
+
+describe('saveLinkSuggestionReport', () => {
+  async function createOutputDirectory(): Promise<string> {
+    const directory = await fs.mkdtemp(path.join(os.tmpdir(), 'arc-links-report-'));
+    temporaryDirectories.push(directory);
+    return fs.realpath(directory);
+  }
+
+  it('writes an exact deterministic Markdown report without machine-specific vault paths', async () => {
+    const vault = await createVault();
+    const outputDirectory = await createOutputDirectory();
+    const result = {
+      vaultPath: vault,
+      noteCount: 2,
+      candidates: [
+        {
+          leftPath: '300_Slipbox/01-graph.md',
+          rightPath: '300_Slipbox/02-networks.md',
+          similarity: 0.875,
+          sharedTerms: ['graph', 'theory', 'nodes'],
+        },
+      ],
+    };
+    const firstOutput = path.join(outputDirectory, 'first.md');
+    const secondOutput = path.join(outputDirectory, 'second.md');
+
+    await saveLinkSuggestionReport(result, firstOutput);
+    await saveLinkSuggestionReport(result, secondOutput);
+
+    const report = [
+      '# ARC Slipbox link suggestions',
+      '',
+      'Notes analyzed: 2',
+      '',
+      'Heuristic lexical matches only. These suggestions require manual review and do not establish that notes are meaningfully related. No notes or links were changed.',
+      '',
+      '## Candidates',
+      '',
+      '1. **87.5%** `300_Slipbox/01-graph.md` <-> `300_Slipbox/02-networks.md`',
+      '   - Shared terms: graph, theory, nodes',
+      '',
+    ].join('\n');
+    expect(await fs.readFile(firstOutput, 'utf8')).toBe(report);
+    expect(await fs.readFile(secondOutput, 'utf8')).toBe(report);
+    expect(report).not.toContain(vault);
+    expect(await fs.readdir(vault)).toEqual(['300_Slipbox']);
+  });
+
+  it('writes a clear report when there are no candidates', async () => {
+    const vault = await createVault();
+    const outputDirectory = await createOutputDirectory();
+    const outputPath = path.join(outputDirectory, 'empty.md');
+
+    await saveLinkSuggestionReport({ vaultPath: vault, noteCount: 0, candidates: [] }, outputPath);
+
+    expect(await fs.readFile(outputPath, 'utf8')).toBe(
+      [
+        '# ARC Slipbox link suggestions',
+        '',
+        'Notes analyzed: 0',
+        '',
+        'Heuristic lexical matches only. These suggestions require manual review and do not establish that notes are meaningfully related. No notes or links were changed.',
+        '',
+        '## Candidates',
+        '',
+        'No candidates met the minimum similarity and shared-term requirements.',
+        '',
+      ].join('\n'),
+    );
+  });
+
+  it('rejects destinations inside the vault, missing parents, and symlinked parents', async () => {
+    const vault = await createVault();
+    const outputDirectory = await createOutputDirectory();
+    const linkedDirectory = path.join(outputDirectory, 'linked');
+    await fs.symlink(outputDirectory, linkedDirectory);
+    const result = { vaultPath: vault, noteCount: 0, candidates: [] };
+
+    await expect(saveLinkSuggestionReport(result, path.join(vault, 'report.md'))).rejects.toThrow(
+      'outside the selected vault',
+    );
+    await expect(
+      saveLinkSuggestionReport(result, path.join(outputDirectory, 'missing', 'report.md')),
+    ).rejects.toThrow('must already exist');
+    await expect(
+      saveLinkSuggestionReport(result, path.join(linkedDirectory, 'report.md')),
+    ).rejects.toThrow('non-symlink directory');
+  });
+
+  it('rejects existing files, directories, and symlinks without replacing their targets', async () => {
+    const vault = await createVault();
+    const outputDirectory = await createOutputDirectory();
+    const existingFile = path.join(outputDirectory, 'existing.md');
+    const existingDirectory = path.join(outputDirectory, 'directory');
+    const linkPath = path.join(outputDirectory, 'link.md');
+    await fs.writeFile(existingFile, 'keep this');
+    await fs.mkdir(existingDirectory);
+    await fs.symlink(existingFile, linkPath);
+    const result = { vaultPath: vault, noteCount: 0, candidates: [] };
+
+    await expect(saveLinkSuggestionReport(result, existingFile)).rejects.toThrow('already exists');
+    await expect(saveLinkSuggestionReport(result, existingDirectory)).rejects.toThrow(
+      'already exists',
+    );
+    await expect(saveLinkSuggestionReport(result, linkPath)).rejects.toThrow('already exists');
+
+    expect(await fs.readFile(existingFile, 'utf8')).toBe('keep this');
+    expect((await fs.lstat(linkPath)).isSymbolicLink()).toBe(true);
+  });
+
+  it('cleans up temporary output and reports write failures', async () => {
+    const vault = await createVault();
+    const outputDirectory = await createOutputDirectory();
+    const outputPath = path.join(outputDirectory, 'report.md');
+    vi.spyOn(fs, 'link').mockRejectedValue(Object.assign(new Error('disk error'), { code: 'EIO' }));
+
+    await expect(
+      saveLinkSuggestionReport({ vaultPath: vault, noteCount: 0, candidates: [] }, outputPath),
+    ).rejects.toThrow('Unable to write the report (EIO): disk error');
+
+    expect(await fs.readdir(outputDirectory)).toEqual([]);
+  });
+
+  it('does not replace a destination that appears before atomic publication', async () => {
+    const vault = await createVault();
+    const outputDirectory = await createOutputDirectory();
+    const outputPath = path.join(outputDirectory, 'report.md');
+    const link = fs.link.bind(fs);
+    vi.spyOn(fs, 'link').mockImplementation(async (temporaryPath, destinationPath) => {
+      await fs.writeFile(outputPath, 'created concurrently');
+      return link(temporaryPath, destinationPath);
+    });
+
+    await expect(
+      saveLinkSuggestionReport({ vaultPath: vault, noteCount: 0, candidates: [] }, outputPath),
+    ).rejects.toThrow('already exists');
+
+    expect(await fs.readFile(outputPath, 'utf8')).toBe('created concurrently');
+    expect(await fs.readdir(outputDirectory)).toEqual(['report.md']);
+  });
+
+  it('surfaces temporary-file cleanup failures', async () => {
+    const vault = await createVault();
+    const outputDirectory = await createOutputDirectory();
+    const outputPath = path.join(outputDirectory, 'report.md');
+    vi.spyOn(fs, 'unlink').mockRejectedValue(
+      Object.assign(new Error('cleanup error'), { code: 'EIO' }),
+    );
+
+    await expect(
+      saveLinkSuggestionReport({ vaultPath: vault, noteCount: 0, candidates: [] }, outputPath),
+    ).rejects.toThrow('Cleanup failed: Unable to remove the temporary report (EIO): cleanup error');
   });
 });
