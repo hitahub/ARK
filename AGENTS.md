@@ -13,7 +13,7 @@ Link to detailed documentation rather than duplicating it.
 - Preserve the CLI's non-destructive behavior and user-authored vault content.
   Ignore files and folder conventions are organizational hints, not security
   boundaries.
-- Keep templates, frontmatter, Dashboard queries, and documented metadata
+- Keep templates, front-matter, Dashboard queries, and documented metadata
   vocabularies consistent.
 
 The [foundation plan](docs/plans/00.arc-cli-foundation.plan.md) records design

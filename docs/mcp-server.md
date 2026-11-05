@@ -53,7 +53,7 @@ and an actionable text message.
 ### `get_active_projects`
 
 Takes no arguments. Searches Markdown files inside project folders below
-`200_Projects/` for notes whose YAML frontmatter has `type: project` and
+`200_Projects/` for notes whose YAML front-matter has `type: project` and
 `status: active`.
 
 ```json
@@ -76,7 +76,7 @@ the filename when no such heading exists.
 
 Takes a non-empty `tag` string of at most 128 characters. Matching is
 case-insensitive after trimming surrounding whitespace. It searches only
-direct Markdown files in `300_Slipbox/`; a note's `tags` frontmatter field must
+direct Markdown files in `300_Slipbox/`; a note's `tags` front-matter field must
 be a YAML list of non-empty strings.
 
 ```json
@@ -116,7 +116,7 @@ Markdown note under `300_Slipbox/`.
 - Hidden path components, symlinks, traversal paths, and all other vault
   locations are rejected or excluded. `.claudeignore` is not read or treated
   as an access-control policy.
-- Frontmatter must be valid YAML. Invalid YAML, invalid consumed metadata, and
+- Front-matter must be valid YAML. Invalid YAML, invalid consumed metadata, and
   filesystem errors are returned as tool errors instead of being silently
   skipped.
 - A note may be at most 65,536 bytes. A scan examines at most 2,000 directory

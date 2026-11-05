@@ -22,7 +22,7 @@ interface Link {
  * Report broken local links, likely orphan notes, and structural verification findings.
  *
  * The link and orphan checks are intentionally heuristic: they do not parse full Markdown
- * syntax, headings, frontmatter, or plugin query results.
+ * syntax, headings, front-matter, or plugin query results.
  *
  * @param targetPath Vault directory to inspect; defaults to the current working directory.
  * @returns Health status and findings in the vault.

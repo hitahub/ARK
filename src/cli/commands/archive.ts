@@ -266,7 +266,7 @@ function hasScalar(frontmatter: string, key: string, value: string): boolean {
 function replaceProjectStatus(content: string, statusPattern: RegExp): string {
   const frontmatter = readFrontmatter(content);
   if (!frontmatter) {
-    throw new Error('Project index frontmatter disappeared while preparing archive.');
+    throw new Error('Project index front-matter disappeared while preparing archive.');
   }
   const updatedFrontmatter = frontmatter.replace(statusPattern, '$1archived$2');
   return content.replace(frontmatter, updatedFrontmatter);

@@ -42,7 +42,7 @@ plugin, use `--no-plugin`. To preview initialization, use `--dry-run`.
 
 Commands that change files preview their proposed changes and ask for
 confirmation by default. Read each command's guide for its flags, scope, and
-safety limits. In particular, `publish` removes YAML frontmatter and checks
+safety limits. In particular, `publish` removes YAML front-matter and checks
 privacy metadata, but does not detect sensitive prose or upload files. Review
 exported content before sharing.
 

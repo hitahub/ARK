@@ -108,7 +108,7 @@ export async function createArcMcpServer(vaultPath: string): Promise<McpServer> 
     {
       title: 'Get active projects',
       description:
-        'List project index notes in 200_Projects/ whose frontmatter has type: project and status: active.',
+        'List project index notes in 200_Projects/ whose front-matter has type: project and status: active.',
       outputSchema: {
         projects: z.array(
           z.object({
@@ -136,7 +136,7 @@ export async function createArcMcpServer(vaultPath: string): Promise<McpServer> 
     {
       title: 'Search Slipbox by tag',
       description:
-        'Find direct Markdown notes in 300_Slipbox/ whose tags frontmatter contains the requested tag (case-insensitive).',
+        'Find direct Markdown notes in 300_Slipbox/ whose tags front-matter contains the requested tag (case-insensitive).',
       inputSchema: { tag: z.string().min(1).max(MAX_TAG_LENGTH) },
       outputSchema: {
         tag: z.string(),
@@ -398,7 +398,7 @@ function parseFrontmatter(
   const match = /^---[ \t]*\r?\n([\s\S]*?)\r?\n---[ \t]*(?:\r?\n|$)/.exec(content);
   if (!match) {
     throw new McpToolError(
-      `Malformed YAML frontmatter in "${relativePath}": missing closing delimiter.`,
+      `Malformed YAML front-matter in "${relativePath}": missing closing delimiter.`,
     );
   }
 
@@ -415,11 +415,11 @@ function parseFrontmatter(
       (Object.getPrototypeOf(metadata) !== Object.prototype &&
         Object.getPrototypeOf(metadata) !== null)
     ) {
-      throw new Error('Frontmatter must be a mapping');
+      throw new Error('Front-matter must be a mapping');
     }
     return Object.fromEntries(Object.entries(metadata));
   } catch {
-    throw new McpToolError(`Malformed YAML frontmatter in "${relativePath}".`);
+    throw new McpToolError(`Malformed YAML front-matter in "${relativePath}".`);
   }
 }
 

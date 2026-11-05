@@ -1,4 +1,4 @@
-// These Dataview queries use the project and task frontmatter contract from the templates.
+// These Dataview queries use the project and task front-matter contract from the templates.
 export const dashboard = `# ARC Dashboard
 
 ## Active Projects

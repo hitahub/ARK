@@ -55,7 +55,7 @@ files and checks a limited structural baseline. It does not create links.
 
 ARC uses two complementary ways to represent work:
 
-1. **Typed notes** use YAML frontmatter such as `type: project` or
+1. **Typed notes** use YAML front-matter such as `type: project` or
    `type: task`. Dataview can query these properties to build tables.
 2. **Markdown checkboxes** such as `- [ ] Follow up` represent individual
    actions. Dataview's `TASK` query can collect these without requiring a
@@ -129,5 +129,5 @@ archived work outside the generated Dashboard queries.
 The scaffold is a starting point, not a closed schema. Add folders and notes
 where useful, rename example projects, and adapt templates to your workflow.
 Keep the required baseline and flat Slipbox rule if you want `arc verify` to
-pass. If you change frontmatter fields or status values, update the templates
+pass. If you change front-matter fields or status values, update the templates
 and their Dataview queries together.

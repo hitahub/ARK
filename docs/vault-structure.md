@@ -73,7 +73,7 @@ additional folders.
 
 ### Notes, links, and metadata
 
-Folder location communicates a note's primary role. Frontmatter communicates
+Folder location communicates a note's primary role. Front-matter communicates
 its type and queryable properties, while Obsidian wikilinks express
 relationships across folders. For example, a project task can live under its
 project, have `type: task` and a `project` value, and link to a Slipbox concept
@@ -108,7 +108,7 @@ or create matching phase notes automatically.
 
 It does **not** require `.gitkeep` markers, a particular year directory, `210_Project_Alpha/`, or `220_Project_B/`. Additional files, projects, phases, year folders, and directories outside the Slipbox are allowed.
 
-Verification checks for presence and basic file/directory types. It does not validate Markdown content, frontmatter correctness, Dataview results, or the user's entire vault layout.
+Verification checks for presence and basic file/directory types. It does not validate Markdown content, front-matter correctness, Dataview results, or the user's entire vault layout.
 
 `arc init` preserves existing scaffold files, including templates and indexes.
 The installed ARC plugin is also preserved unless its manifest version differs

@@ -107,7 +107,7 @@ Additional user folders and files are allowed. The example project is scaffolded
 
 `arc links suggest <vault-path>` requires an explicit vault directory and
 analyzes only direct, non-hidden Markdown files in `300_Slipbox/`. It uses
-deterministic local TF-IDF cosine similarity; frontmatter and code blocks do
+deterministic local TF-IDF cosine similarity; front-matter and code blocks do
 not contribute to matching. The report shows at most 20 pairs that share at
 least two non-stopword terms and meet the minimum similarity threshold,
 alongside the strongest shared terms. Scores are heuristic and do not establish
@@ -207,7 +207,7 @@ Use `--exclude <vault-relative-path>` one or more times to omit selected files
 or folders. Hidden paths, `.obsidian/`, `.git/`, `.arc-backups/`,
 `900_Archive/`, `999_Templates/`, and `Past_Phases_Archive/` are excluded
 automatically. Symlinks and special files in selected content are rejected.
-Exports contain Markdown bodies only: all YAML frontmatter is removed. Notes
+Exports contain Markdown bodies only: all YAML front-matter is removed. Notes
 marked `private`, `sensitive`, `secret`, or `confidential`, with `publish: false`,
 with private/restricted visibility or classification, or with a
 privacy-sensitive tag are rejected; ambiguous values also fail closed. The source vault is

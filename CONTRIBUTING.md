@@ -55,7 +55,7 @@ Use a descriptive branch name appropriate to the change; the example above is no
 
 - Preserve the CLI's non-destructive behavior: initialization must not overwrite existing vault files.
 - Surface filesystem and command errors clearly; avoid silent failures or success-shaped fallbacks.
-- Keep generated templates, frontmatter fields, status values, and Dataview queries consistent.
+- Keep generated templates, front-matter fields, status values, and Dataview queries consistent.
 - Add or update tests when observable behavior changes.
 - Update the relevant user or developer documentation when commands, behavior, metadata, or setup instructions change. Documentation is under [`docs/`](docs/); the README links to the guides.
 - Keep future or experimental ideas clearly distinguished from implemented features.
@@ -78,7 +78,7 @@ When changing it:
   changes; avoid task-specific instructions and duplicated reference material.
 - Check that commands, paths, and relative Markdown links are accurate.
 
-For an overview of the codebase and implementation flows, see [ `docs/development.md`](docs/development.md). For CLI and vault behavior, see [`docs/getting-started.md`](docs/getting-started.md) and [`docs/vault-structure.md`](docs/vault-structure.md).
+For an overview of the codebase and implementation flows, see [`docs/development.md`](docs/development.md). For CLI and vault behavior, see [`docs/getting-started.md`](docs/getting-started.md) and [`docs/vault-structure.md`](docs/vault-structure.md).
 
 ## Validate your work
 

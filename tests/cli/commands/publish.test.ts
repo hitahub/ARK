@@ -60,7 +60,7 @@ describe('publishSelectedContent', () => {
     expect(await fs.readFile(path.join(project, 'Project.md'), 'utf8')).toBe(original);
   });
 
-  it('writes selected notes only after approval and removes all frontmatter', async () => {
+  it('writes selected notes only after approval and removes all front-matter', async () => {
     const { vault, outputParent } = await createWorkspace();
     const project = path.join(vault, '200_Projects', 'Selected');
     await fs.ensureDir(path.join(project, 'Phase_01'));
@@ -122,7 +122,7 @@ describe('publishSelectedContent', () => {
     ).rejects.toThrow(expectedError);
   });
 
-  it('rejects malformed frontmatter rather than exporting an ambiguous note', async () => {
+  it('rejects malformed front-matter rather than exporting an ambiguous note', async () => {
     const { vault, outputParent } = await createWorkspace();
     await fs.writeFile(path.join(vault, 'note.md'), '---\nprivate: true\n\n# Note');
 

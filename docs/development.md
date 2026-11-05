@@ -50,7 +50,7 @@ The plugin build derives its manifest version from the root `package.json`, whic
 
 ### Verification flow
 
-Verification checks the required directory/file baseline and checks direct entries in `300_Slipbox/` for directories, including symlinks to directories. It allows user content elsewhere. It is a structural check only, not a Markdown/frontmatter or Dataview validator.
+Verification checks the required directory/file baseline and checks direct entries in `300_Slipbox/` for directories, including symlinks to directories. It allows user content elsewhere. It is a structural check only, not a Markdown/front-matter or Dataview validator.
 
 `health` adds a best-effort local-link scan and inbound-link heuristic for notes in ARC content layers; it also reports `verify` findings. It is read-only and intentionally does not parse Markdown syntax or validate headings and metadata. `update` previews all scaffold additions and replacements, requires confirmation unless `--yes` is supplied, backs up replaced files under `.arc-backups/`, and leaves unchanged files and symlinks alone.
 `archive` moves a project marked `status: done` into `900_Archive/Projects/`,
@@ -94,7 +94,7 @@ node bin/cli.mjs mcp /absolute/path/to/your/vault
 Tests use Vitest and run against temporary directories. The current suite covers:
 
 - directory creation and safe write-if-missing behavior;
-- template registry, metadata conventions, and frontmatter shape;
+- template registry, metadata conventions, and front-matter shape;
 - init confirmation, current-year folder creation, repeatability, existing-file preservation, and filesystem errors;
 - CLI command routing and version registration;
 - verify baseline failures, allowed user content, flat Slipbox enforcement, and directory symlinks;
@@ -130,6 +130,6 @@ request title against the ruleset documented in
 
 - Keep filesystem writes non-destructive; preserve user-authored vault content.
 - Treat `.claudeignore` and folder conventions as hints, not access controls.
-- Keep template frontmatter, Dashboard queries, and documented metadata/status vocabularies aligned.
+- Keep template front-matter, Dashboard queries, and documented metadata/status vocabularies aligned.
 - Update tests and these docs when observable CLI behavior changes.
 - Keep future roadmap capabilities clearly separated from implemented behavior.

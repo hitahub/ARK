@@ -42,7 +42,7 @@ Markdown tasks. It does not create projects, assign tasks, or update statuses.
 
 ## Archive a completed project
 
-1. Set the project index frontmatter to `status: done`.
+1. Set the project index front-matter to `status: done`.
 2. Preview the move with `arc archive "Project Alpha" ./MyVault --dry-run`.
 3. Run `arc archive "Project Alpha" ./MyVault` and confirm, or add `--yes` for
    non-interactive use.
@@ -61,7 +61,7 @@ task-note, or action-item views.
 1. Create a note under `400_Journal/<year>/` using `TPL_Daily_Journal.md` for
    a date-based record.
 2. Use `TPL_Meeting_Note.md` for a meeting. Add attendees and the related
-   project to its frontmatter when relevant.
+   project to its front-matter when relevant.
 3. Record follow-ups as Markdown checkboxes. Keep the notes under
    `200_Projects/` or `400_Journal/` if you want the generated Dashboard's
    Open Action Items query to find them.

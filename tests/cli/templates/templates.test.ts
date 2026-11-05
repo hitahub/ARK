@@ -2,7 +2,7 @@ import { describe, expect, it } from 'vitest';
 import { files } from '../../../src/cli/templates/index.js';
 
 describe('generated templates', () => {
-  it('uses valid-looking YAML frontmatter in all Templater templates', () => {
+  it('uses valid-looking YAML front-matter in all Templater templates', () => {
     const templatePaths = [
       '999_Templates/TPL_Concept.md',
       '999_Templates/TPL_Project_Task.md',

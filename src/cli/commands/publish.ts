@@ -353,7 +353,7 @@ function stripFrontmatter(content: string, relativePath: string): string {
   if (!/^---[ \t]*\r?\n/.test(normalized)) return normalized;
   const match = /^---[ \t]*\r?\n([\s\S]*?)\r?\n---[ \t]*(?:\r?\n|$)/.exec(normalized);
   if (!match) {
-    throw new Error(`Malformed YAML frontmatter in "${relativePath}": missing closing delimiter.`);
+    throw new Error(`Malformed YAML front-matter in "${relativePath}": missing closing delimiter.`);
   }
 
   let metadata: unknown;
@@ -362,7 +362,7 @@ function stripFrontmatter(content: string, relativePath: string): string {
     if (document.errors.length > 0) throw new Error('Invalid YAML');
     metadata = document.toJS({ maxAliasCount: 0 });
   } catch {
-    throw new Error(`Malformed YAML frontmatter in "${relativePath}".`);
+    throw new Error(`Malformed YAML front-matter in "${relativePath}".`);
   }
   if (metadata === null) {
     return normalized.slice(match[0].length).replace(/^(?:\r?\n)/, '');
@@ -373,7 +373,7 @@ function stripFrontmatter(content: string, relativePath: string): string {
     (Object.getPrototypeOf(metadata) !== Object.prototype &&
       Object.getPrototypeOf(metadata) !== null)
   ) {
-    throw new Error(`Malformed YAML frontmatter in "${relativePath}": expected a mapping.`);
+    throw new Error(`Malformed YAML front-matter in "${relativePath}": expected a mapping.`);
   }
   assertNotPrivateMetadata(metadata, relativePath);
   return normalized.slice(match[0].length).replace(/^(?:\r?\n)/, '');
@@ -440,7 +440,7 @@ function reportPublishPreview(plan: ExportPlan, outputPath: string): void {
   logger.info(`Publish preview: ${plan.notes.length} Markdown note(s) -> ${outputPath}`);
   for (const note of plan.notes) logger.info(`  include ${note.path}`);
   for (const excluded of plan.excluded) logger.warning(`  exclude ${excluded}`);
-  logger.info('All YAML frontmatter will be removed; review note bodies before publishing.');
+  logger.info('All YAML front-matter will be removed; review note bodies before publishing.');
 }
 
 async function writeExport(
