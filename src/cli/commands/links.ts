@@ -15,6 +15,13 @@ const MAX_SUGGESTIONS = 20;
 const MIN_SHARED_TERMS = 2;
 const MIN_SIMILARITY = 0.12;
 const MAX_DISPLAY_TERMS = 5;
+const MAX_SEMANTIC_NOTES = 100;
+const MAX_SEMANTIC_NOTE_CHARACTERS = 8_000;
+const MAX_SEMANTIC_TOTAL_CHARACTERS = 512_000;
+const OLLAMA_EMBEDDING_URL = 'http://127.0.0.1:11434/api/embed';
+const OLLAMA_BATCH_SIZE = 16;
+const OLLAMA_TIMEOUT_MS = 120_000;
+const MAX_EMBEDDING_DIMENSIONS = 8_192;
 
 const STOP_WORDS = new Set(
   `a about after all also am an and any are as at be because been before being between both but by can could did do does doing down during each few for from further had has have having he her here hers herself him himself his how i if in into is it its itself just me more most my myself no nor not of off on once only or other our ours ourselves out over own same she should so some such than that the their theirs them themselves then there these they this those through to too under until up very was we were what when where which while who whom why will with would you your yours yourself yourselves`.split(
@@ -25,6 +32,7 @@ const STOP_WORDS = new Set(
 interface Note {
   path: string;
   terms: Map<string, number>;
+  semanticText?: string;
 }
 
 class LinkSuggestionError extends Error {}
@@ -42,20 +50,47 @@ interface CandidateScore {
   displayedTerms: Array<{ term: string; inverseDocumentFrequency: number }>;
 }
 
-export interface LinkSuggestions {
+interface LinkSuggestionResult {
   vaultPath: string;
   noteCount: number;
   candidates: Candidate[];
 }
 
+export type LinkSuggestions = LinkSuggestionResult &
+  ({ matcher: 'lexical'; model?: never } | { matcher: 'semantic'; model: string });
+
+export interface LinkSuggestionOptions {
+  semantic?: boolean;
+  model?: string;
+}
+
 /**
- * Find a bounded set of lexical suggestions between direct Slipbox notes.
+ * Find a bounded set of lexical or explicitly selected local semantic suggestions.
  *
  * @param vaultPath Explicitly selected ARC vault directory.
+ * @param options Selects local Ollama embeddings; lexical matching remains the default.
  * @returns Ranked suggestions; the vault and source notes are never modified.
  * @throws If the selected content is unsafe, unreadable, invalid, or exceeds scan limits.
  */
-export async function suggestRelatedNotes(vaultPath: string): Promise<LinkSuggestions> {
+export async function suggestRelatedNotes(
+  vaultPath: string,
+  options: LinkSuggestionOptions = {},
+): Promise<LinkSuggestions> {
+  const semantic = options.semantic ?? false;
+  const selectedModel = options.model;
+  const model = semantic ? selectedModel?.trim() : undefined;
+  if (semantic && !model?.trim()) {
+    throw new LinkSuggestionError(
+      'Provide an installed Ollama model with --model for semantic matching.',
+    );
+  }
+  if (!semantic && selectedModel !== undefined) {
+    throw new LinkSuggestionError('--model can only be used together with --semantic.');
+  }
+  if (model !== undefined && (/[\u0000-\u001f\u007f-\u009f]/.test(model) || model.length > 128)) {
+    throw new LinkSuggestionError('The Ollama model name is invalid.');
+  }
+
   const vaultRoot = await resolveVaultRoot(vaultPath);
   const slipboxPath = path.join(vaultRoot, SLIPBOX_DIRECTORY);
   const slipboxStats = await lstat(slipboxPath, SLIPBOX_DIRECTORY);
@@ -72,6 +107,7 @@ export async function suggestRelatedNotes(vaultPath: string): Promise<LinkSugges
   const notes: Note[] = [];
   let scannedBytes = 0;
   let uniqueTermCount = 0;
+  let semanticCharacters = 0;
   for (const entry of entries) {
     if (/[\u0000-\u001f\u007f-\u009f]/.test(entry.name)) {
       throw new LinkSuggestionError('Slipbox note paths cannot contain control characters.');
@@ -89,6 +125,11 @@ export async function suggestRelatedNotes(vaultPath: string): Promise<LinkSugges
     if (notes.length >= MAX_NOTES) {
       throw new LinkSuggestionError(`Slipbox scan exceeds the ${MAX_NOTES}-note limit.`);
     }
+    if (model !== undefined && notes.length >= MAX_SEMANTIC_NOTES) {
+      throw new LinkSuggestionError(
+        `Semantic matching exceeds the ${MAX_SEMANTIC_NOTES}-note limit.`,
+      );
+    }
 
     const relativePath = `${SLIPBOX_DIRECTORY}/${entry.name}`;
     const contents = await readNote(vaultRoot, slipboxPath, entry.name, relativePath);
@@ -105,12 +146,44 @@ export async function suggestRelatedNotes(vaultPath: string): Promise<LinkSugges
         `Slipbox scan exceeds the ${MAX_UNIQUE_TERMS}-unique-term limit.`,
       );
     }
-    notes.push({ path: relativePath, terms });
+    const note: Note = { path: relativePath, terms };
+    if (model !== undefined) {
+      const text = prepareSemanticText(contents);
+      if (!text) {
+        throw new LinkSuggestionError(
+          `Note "${relativePath}" has no semantic text after excluding front-matter and code.`,
+        );
+      }
+      if (text.length > MAX_SEMANTIC_NOTE_CHARACTERS) {
+        throw new LinkSuggestionError(
+          `Note "${relativePath}" exceeds the ${MAX_SEMANTIC_NOTE_CHARACTERS}-character semantic input limit.`,
+        );
+      }
+      semanticCharacters += text.length;
+      if (semanticCharacters > MAX_SEMANTIC_TOTAL_CHARACTERS) {
+        throw new LinkSuggestionError(
+          `Semantic matching exceeds the ${MAX_SEMANTIC_TOTAL_CHARACTERS}-character total input limit.`,
+        );
+      }
+      note.semanticText = text;
+    }
+    notes.push(note);
   }
 
   notes.sort((left, right) => compareText(left.path, right.path));
+  if (model !== undefined) {
+    const embeddings = await embedNotes(notes, model);
+    const candidates = rankSemanticCandidates(notes, embeddings);
+    return {
+      vaultPath: vaultRoot,
+      noteCount: notes.length,
+      matcher: 'semantic',
+      model,
+      candidates,
+    };
+  }
   const candidates = rankCandidates(notes);
-  return { vaultPath: vaultRoot, noteCount: notes.length, candidates };
+  return { vaultPath: vaultRoot, noteCount: notes.length, matcher: 'lexical', candidates };
 }
 
 /**
@@ -121,16 +194,30 @@ export async function suggestRelatedNotes(vaultPath: string): Promise<LinkSugges
 export function reportLinkSuggestions(result: LinkSuggestions): void {
   console.log(`ARC Slipbox link suggestions (${result.noteCount} notes): ${result.vaultPath}`);
   if (result.candidates.length === 0) {
-    console.log('No candidates met the minimum similarity and shared-term requirements.');
+    console.log(
+      result.matcher === 'semantic'
+        ? 'No candidate pairs were available for semantic matching.'
+        : 'No candidates met the minimum similarity and shared-term requirements.',
+    );
     return;
   }
 
-  console.log('Heuristic lexical matches only; review each candidate. No notes were changed.');
+  console.log(
+    result.matcher === 'semantic'
+      ? `Heuristic semantic matches from local Ollama model "${result.model}". Review each candidate; scores do not prove a relationship. No notes were changed.`
+      : 'Heuristic lexical matches only; review each candidate. No notes were changed.',
+  );
   for (const [index, candidate] of result.candidates.entries()) {
+    const score =
+      result.matcher === 'semantic'
+        ? `cosine=${candidate.similarity.toFixed(3)}`
+        : `${(candidate.similarity * 100).toFixed(1)}%`;
     console.log(
-      `${index + 1}. ${(candidate.similarity * 100).toFixed(1)}% ` +
+      `${index + 1}. ${score} ` +
         `${candidate.leftPath} <-> ${candidate.rightPath} ` +
-        `(shared terms: ${candidate.sharedTerms.join(', ')})`,
+        (result.matcher === 'semantic'
+          ? '(local embedding cosine similarity)'
+          : `(shared terms: ${candidate.sharedTerms.join(', ')})`),
     );
   }
 }
@@ -224,24 +311,36 @@ export async function saveLinkSuggestionReport(
 }
 
 function formatLinkSuggestionReport(result: LinkSuggestions): string {
+  const isSemantic = result.matcher === 'semantic';
   const lines = [
     '# ARC Slipbox link suggestions',
     '',
     `Notes analyzed: ${result.noteCount}`,
     '',
-    'Heuristic lexical matches only. These suggestions require manual review and do not establish that notes are meaningfully related. No notes or links were changed.',
+    isSemantic
+      ? `Heuristic semantic matches from local Ollama model ${markdownCode(result.model)}. Similarity scores do not prove that notes are meaningfully related. Review each candidate manually. No notes or links were changed.`
+      : 'Heuristic lexical matches only. These suggestions require manual review and do not establish that notes are meaningfully related. No notes or links were changed.',
     '',
     '## Candidates',
     '',
   ];
   if (result.candidates.length === 0) {
-    lines.push('No candidates met the minimum similarity and shared-term requirements.');
+    lines.push(
+      isSemantic
+        ? 'No candidate pairs were available for semantic matching.'
+        : 'No candidates met the minimum similarity and shared-term requirements.',
+    );
   } else {
     for (const [index, candidate] of result.candidates.entries()) {
+      const score = isSemantic
+        ? candidate.similarity.toFixed(3)
+        : `${(candidate.similarity * 100).toFixed(1)}%`;
       lines.push(
-        `${index + 1}. **${(candidate.similarity * 100).toFixed(1)}%** ` +
+        `${index + 1}. **${score}** ` +
           `${markdownCode(candidate.leftPath)} <-> ${markdownCode(candidate.rightPath)}`,
-        `   - Shared terms: ${candidate.sharedTerms.join(', ')}`,
+        isSemantic
+          ? '   - Score: local embedding cosine similarity, not a probability'
+          : `   - Shared terms: ${candidate.sharedTerms.join(', ')}`,
       );
     }
   }
@@ -550,6 +649,143 @@ function tokenize(contents: string): Map<string, number> {
     terms.set(term, (terms.get(term) ?? 0) + 1);
   }
   return terms;
+}
+
+function prepareSemanticText(contents: string): string {
+  return contents
+    .replace(/^---[ \t]*\r?\n[\s\S]*?\r?\n---[ \t]*(?:\r?\n|$)/, '')
+    .replace(/```[\s\S]*?```|~~~[\s\S]*?~~~/g, ' ')
+    .replace(/`[^`]*`/g, ' ')
+    .replace(/!?\[([^\]]*)\]\([^)]+\)/g, '$1')
+    .replace(/\[\[([^\]|#]+)(?:#[^\]|]+)?(?:\|([^\]]+))?\]\]/g, '$2 $1')
+    .replace(/<[^>]*>/g, ' ')
+    .replace(/^#{1,6}\s+/gm, '')
+    .normalize('NFKC')
+    .replace(/\s+/g, ' ')
+    .trim();
+}
+
+function isNumberVector(value: unknown): value is number[] {
+  return (
+    Array.isArray(value) &&
+    value.length > 0 &&
+    value.length <= MAX_EMBEDDING_DIMENSIONS &&
+    value.every((item) => typeof item === 'number' && Number.isFinite(item))
+  );
+}
+
+async function embedNotes(notes: Note[], model: string): Promise<number[][]> {
+  const embeddings: number[][] = [];
+  let dimensions: number | undefined;
+
+  for (let offset = 0; offset < notes.length; offset += OLLAMA_BATCH_SIZE) {
+    const batch = notes.slice(offset, offset + OLLAMA_BATCH_SIZE);
+    let response: Response;
+    try {
+      response = await fetch(OLLAMA_EMBEDDING_URL, {
+        method: 'POST',
+        headers: { 'content-type': 'application/json' },
+        body: JSON.stringify({
+          model,
+          input: batch.map((note) => note.semanticText ?? ''),
+        }),
+        redirect: 'error',
+        signal: AbortSignal.timeout(OLLAMA_TIMEOUT_MS),
+      });
+    } catch (error) {
+      const detail =
+        error instanceof Error && error.name === 'TimeoutError'
+          ? `The Ollama request exceeded ${OLLAMA_TIMEOUT_MS / 1_000} seconds.`
+          : `Unable to connect to local Ollama at 127.0.0.1:11434${error instanceof Error ? `: ${error.message}` : '.'}`;
+      throw new LinkSuggestionError(detail);
+    }
+
+    let payload: unknown;
+    try {
+      payload = await response.json();
+    } catch (error) {
+      throw new LinkSuggestionError(
+        `Local Ollama returned an invalid embedding response${error instanceof Error ? `: ${error.message}` : '.'}`,
+      );
+    }
+    if (!response.ok) {
+      const detail =
+        typeof payload === 'object' &&
+        payload !== null &&
+        'error' in payload &&
+        typeof payload.error === 'string'
+          ? `: ${payload.error}`
+          : '';
+      throw new LinkSuggestionError(
+        `Local Ollama embedding request failed (HTTP ${response.status})${detail}.`,
+      );
+    }
+    if (
+      typeof payload !== 'object' ||
+      payload === null ||
+      !('embeddings' in payload) ||
+      !Array.isArray(payload.embeddings) ||
+      payload.embeddings.length !== batch.length
+    ) {
+      throw new LinkSuggestionError('Local Ollama returned an unexpected embedding count.');
+    }
+
+    for (const value of payload.embeddings) {
+      if (!isNumberVector(value)) {
+        throw new LinkSuggestionError('Local Ollama returned an invalid embedding vector.');
+      }
+      const vector = value;
+      if (dimensions !== undefined && dimensions !== vector.length) {
+        throw new LinkSuggestionError('Local Ollama returned inconsistent embedding dimensions.');
+      }
+      dimensions = vector.length;
+      if (vector.every((item) => item === 0)) {
+        throw new LinkSuggestionError('Local Ollama returned an empty embedding vector.');
+      }
+      embeddings.push(vector);
+    }
+  }
+  return embeddings;
+}
+
+function rankSemanticCandidates(notes: Note[], embeddings: number[][]): Candidate[] {
+  if (notes.length !== embeddings.length) {
+    throw new LinkSuggestionError('Unable to rank semantic candidates: embedding count mismatch.');
+  }
+  const normalizedEmbeddings = embeddings.map((vector) => {
+    const scale = vector.reduce((largest, value) => Math.max(largest, Math.abs(value)), 0);
+    const scaled = vector.map((value) => value / scale);
+    const norm = Math.sqrt(scaled.reduce((sum, value) => sum + value * value, 0));
+    return scaled.map((value) => value / norm);
+  });
+  const candidates: Candidate[] = [];
+
+  for (let left = 0; left < notes.length; left += 1) {
+    for (let right = left + 1; right < notes.length; right += 1) {
+      if (normalizedEmbeddings[left].length !== normalizedEmbeddings[right].length) {
+        throw new LinkSuggestionError('Unable to rank semantic candidates: dimension mismatch.');
+      }
+      const dotProduct = normalizedEmbeddings[left].reduce(
+        (sum, value, index) => sum + value * normalizedEmbeddings[right][index],
+        0,
+      );
+      candidates.push({
+        leftPath: notes[left].path,
+        rightPath: notes[right].path,
+        similarity: Math.max(-1, Math.min(1, dotProduct)),
+        sharedTerms: [],
+      });
+    }
+  }
+
+  return candidates
+    .sort(
+      (left, right) =>
+        right.similarity - left.similarity ||
+        compareText(left.leftPath, right.leftPath) ||
+        compareText(left.rightPath, right.rightPath),
+    )
+    .slice(0, MAX_SUGGESTIONS);
 }
 
 function rankCandidates(notes: Note[]): Candidate[] {

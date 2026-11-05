@@ -64,6 +64,11 @@ read-only tools expose active project index metadata and direct Slipbox notes;
 path validation, YAML parsing, and response/scan limits are implemented in
 `src/cli/commands/mcp.ts`. See [ARC MCP server](mcp-server.md) for the public
 tool contract and limitations.
+`arc links suggest` keeps deterministic lexical matching as its offline
+default; the explicit `--semantic --model <name>` mode uses an installed local
+Ollama model through the fixed loopback endpoint. See the [link suggestion
+behavior](getting-started.md#links-suggest-behavior) for its limits and privacy
+contract.
 
 ## Useful commands
 
@@ -105,8 +110,9 @@ Tests use Vitest and run against temporary directories. The current suite covers
   symlink safety, and linked worktrees;
 - MCP tool schemas and results, metadata errors, content and result limits,
   vault-relative path boundaries, symlink rejection, and read-only behavior;
-- local Slipbox link suggestion ranking, scan limits, symlink rejection, CLI
-  routing, and read-only behavior;
+- local Slipbox lexical and semantic link suggestion ranking, Ollama request
+  failures and limits, scan limits, symlink rejection, CLI routing, and
+  read-only behavior;
 - plugin installation by default, opt-out, dry-run, collision preservation, and symlink safety.
 
 Run all tests with `pnpm test`.

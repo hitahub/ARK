@@ -25,4 +25,4 @@ Plan files use this naming convention:
 | [07.semantic-auto-link-suggestions.plan.md](./07.semantic-auto-link-suggestions.plan.md)                             | Exploratory plan for offline, reviewable Slipbox link suggestions.                   |
 | [08.publishing-selected-content.plan.md](./08.publishing-selected-content.plan.md)                                   | Implemented local workflow for exporting a reviewable subset of vault content.       |
 | [09.saving-link-suggestion-reports.plan.md](./09.saving-link-suggestion-reports.plan.md)                             | Implemented explicit, local saving of link-suggestion reports.                       |
-| [10.evaluating-semantic-link-matching.plan.md](./10.evaluating-semantic-link-matching.plan.md)                       | Synthetic local-embedding evaluation; more evidence is needed before implementation. |
+| [10.evaluating-semantic-link-matching.plan.md](./10.evaluating-semantic-link-matching.plan.md)                       | Synthetic evaluation and approved scope for opt-in local semantic matching.          |

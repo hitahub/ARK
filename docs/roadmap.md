@@ -45,13 +45,12 @@ compatibility. Local hooks are not a CI or security guarantee.
 
 `arc links suggest <vault-path>` reports bounded, deterministic lexical
 matches among direct Markdown notes in `300_Slipbox/`. It is offline and
-read-only; users review and apply any links themselves. Embedding-based
-matching and caching remain exploratory follow-ups, not current behavior. The
-optional `--output` report feature is implemented; see the
+read-only; users review and apply any links themselves. Optional semantic
+matching is available with an installed local Ollama model and explicit
+`--semantic --model <name>` flags; the default remains lexical. Caching remains
+exploratory. The optional `--output` report feature is implemented; see the
 [saved link-suggestion reports plan](plans/09.saving-link-suggestion-reports.plan.md).
-A limited synthetic evaluation with a local embedding model showed higher
-top-five and top-ten recall than the lexical baseline. This is not sufficient
-evidence to approve implementation; see the
+A limited synthetic evaluation and implementation details are recorded in the
 [semantic matching evaluation](plans/10.evaluating-semantic-link-matching.plan.md).
 See [Getting started](getting-started.md#links-suggest-behavior) for its
 limits.
