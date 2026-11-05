@@ -38,8 +38,8 @@ Requirements:
 Fork and clone the repository, then install dependencies:
 
 ```bash
-git clone https://github.com/hitahub/ARK.git
-cd ARK
+git clone https://github.com/hitahub/arc.git
+cd arc
 pnpm install
 ```
 
