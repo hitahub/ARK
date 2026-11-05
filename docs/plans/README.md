@@ -24,3 +24,4 @@ Plan files use this naming convention:
 | [06.arc-aware-mcp-server.plan.md](./06.arc-aware-mcp-server.plan.md)                                                 | Implemented scope and data contract for the optional read-only MCP server.           |
 | [07.semantic-auto-link-suggestions.plan.md](./07.semantic-auto-link-suggestions.plan.md)                             | Exploratory plan for offline, reviewable Slipbox link suggestions.                   |
 | [08.publishing-selected-content.plan.md](./08.publishing-selected-content.plan.md)                                   | Implemented local workflow for exporting a reviewable subset of vault content.       |
+| [09.saving-link-suggestion-reports.plan.md](./09.saving-link-suggestion-reports.plan.md)                              | Proposed explicit, local saving of link-suggestion reports.                         |
