@@ -1,41 +1,38 @@
 # Repository guidance
 
-This file is a concise working guide for human contributors and coding agents.
-Keep instructions actionable and repository-specific; link to detailed
-documentation instead of duplicating it.
+Keep this guide concise, actionable, and specific to repository-wide work.
+Link to detailed documentation rather than duplicating it.
 
-## Project foundations
+## Project principles
 
 - ARC combines clear organizational boundaries (ACCESS), connected atomic
   knowledge (Zettelkasten), and iterative execution (Agile phases). Folders
-  help people and clients understand scope; they do not enforce permissions.
-- Keep `300_Slipbox/` flat: concept and technical notes belong directly in
-  that directory and connect through Obsidian wiki-links.
+  communicate scope; they do not enforce permissions.
+- Keep `300_Slipbox/` flat. Put concept and technical notes directly in it and
+  connect them with Obsidian wiki-links.
 - Preserve the CLI's non-destructive behavior and user-authored vault content.
-  Ignore files and folder conventions are hints, not access controls.
+  Ignore files and folder conventions are organizational hints, not security
+  boundaries.
 - Keep templates, frontmatter, Dashboard queries, and documented metadata
-  vocabularies aligned.
+  vocabularies consistent.
 
-The original design rationale is in
-[`docs/plans/00.arc-cli-foundation.plan.md`](docs/plans/00.arc-cli-foundation.plan.md).
-That plan records the foundation, not necessarily current behavior. For current
-architecture, commands, and validation, follow the implementation and
-[`docs/development.md`](docs/development.md); label roadmap ideas as planned
-rather than implemented.
+The [foundation plan](docs/plans/00.arc-cli-foundation.plan.md) records design
+rationale, not necessarily current behavior. Treat the implementation and
+[development guide](docs/development.md) as the source of truth; describe
+roadmap ideas as planned, not implemented.
 
-## Working in this repository
+## Working in the codebase
 
-- Use Node.js 20 or newer and pnpm. The project is ESM; TypeScript source
-  imports use `.js` extensions for NodeNext resolution.
-- CLI implementation is in `src/cli/`, the Obsidian plugin is in
-  `src/obsidian-plugin/`, and tests are in `tests/`.
-- Keep changes focused. When observable behavior changes, add or update tests
-  and relevant documentation.
-- Report filesystem and command errors clearly. Do not silently hide failures
-  or add success-shaped fallbacks.
-- Do not add credentials, tokens, private keys, or other secrets.
+- Use Node.js 20 or newer and pnpm. This is an ESM project; TypeScript imports
+  use `.js` extensions for NodeNext resolution.
+- CLI code is in `src/cli/`, the Obsidian plugin is in `src/obsidian-plugin/`,
+  and tests are in `tests/`.
+- Keep changes focused. For observable behavior changes, update tests and
+  relevant documentation.
+- Surface filesystem and command errors; do not hide failures or add
+  success-shaped fallbacks. Never add credentials or other secrets.
 
-Run the relevant checks before proposing a change:
+Run checks relevant to the change. The full validation set is:
 
 ```bash
 pnpm format:check
@@ -44,8 +41,7 @@ pnpm typecheck
 pnpm build
 ```
 
-For documentation-only changes, `pnpm format:check` and checking changed
-relative Markdown links are sufficient. See
-[`CONTRIBUTING.md`](CONTRIBUTING.md) and
-[`docs/development.md`](docs/development.md) for the full contribution and
-development guidance.
+For documentation-only changes, run `pnpm format:check` and verify changed
+relative Markdown links. See [CONTRIBUTING.md](CONTRIBUTING.md) and the
+[development guide](docs/development.md) for detailed contribution and
+validation guidance.
