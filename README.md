@@ -1,105 +1,83 @@
 # ARC CLI
 
-ARC CLI scaffolds, verifies, inspects, and safely updates an **Atomic Rosetta Contextual (ARC)** knowledge vault. It creates an Obsidian-friendly folder structure, Markdown dashboards, and starter templates while preserving existing files unless a user confirms a plugin version update.
-
-> The npm package is named `@hitahub/arc`; the executable is named `arc`. The `npx` and `pnpm dlx` commands below require the package to be published and accessible from your configured registry.
+ARC CLI helps you build and maintain an Obsidian vault for connected knowledge,
+projects, and journals. It scaffolds an **Atomic Rosetta Contextual (ARC)**
+structure and provides commands to check and manage it while preserving your
+existing notes.
 
 ## Quick start
 
-```bash
-npx @hitahub/arc init ./MyNewVault
-npx @hitahub/arc verify ./MyNewVault
-npx @hitahub/arc health ./MyNewVault
-npx @hitahub/arc update ./MyNewVault
-npx @hitahub/arc archive "Project Alpha" ./MyNewVault --dry-run
-npx @hitahub/arc links suggest ./MyNewVault
-npx @hitahub/arc publish ./MyNewVault 200_Projects/ProjectA --output ./publish-review --dry-run
-npx @hitahub/arc mcp /absolute/path/to/your/vault
-```
-
-Git hooks are opt-in. Preview and explicitly install ARC's health check in a
-Git repository with `arc hook install ./MyNewVault --repo . --dry-run`, then
-repeat without `--dry-run` to install. See
-[Getting started](docs/getting-started.md#git-hook-integration) for details.
-
-Or with pnpm:
+The npm package is `@hitahub/arc`; its command is `arc`. The registry commands
+below require the package to be published and available from your configured
+registry. To run ARC from a local checkout, see [Getting started](docs/getting-started.md#run-from-a-checkout).
 
 ```bash
-pnpm dlx @hitahub/arc init ./MyNewVault
-pnpm dlx @hitahub/arc verify ./MyNewVault
-pnpm dlx @hitahub/arc health ./MyNewVault
-pnpm dlx @hitahub/arc update ./MyNewVault
-pnpm dlx @hitahub/arc archive "Project Alpha" ./MyNewVault --dry-run
-pnpm dlx @hitahub/arc hook install ./MyNewVault --repo . --dry-run
-pnpm dlx @hitahub/arc links suggest ./MyNewVault
-pnpm dlx @hitahub/arc publish ./MyNewVault 200_Projects/ProjectA --output ./publish-review --dry-run
-pnpm dlx @hitahub/arc mcp /absolute/path/to/your/vault
+npx @hitahub/arc init ./MyVault
+npx @hitahub/arc verify ./MyVault
+npx @hitahub/arc health ./MyVault
 ```
 
-Use `arc init` without a path to scaffold the current directory after confirming. Initialization creates missing files and preserves existing ones, except for an ARC plugin update explicitly confirmed by the user.
+`init` creates the vault structure, dashboards, and starter templates. It also
+installs the ARC Obsidian companion plugin by default. Enable it in Obsidian
+under **Settings → Community plugins**. ARC does not install or configure
+Dataview or Templater; see [Obsidian setup](docs/obsidian-setup.md).
 
-`init` and `update` support `--dry-run` to preview changes. `update --yes` applies
-the preview without prompting; changed scaffold files are backed up under
-`.arc-backups/` before replacement.
+`verify` checks the required folder and file structure. `health` reports
+structural issues, broken local links, and likely orphan notes; it is a
+read-only heuristic check, not a full Markdown or metadata validator.
 
-`archive` previews and confirms moving a project marked `status: done` from
-`200_Projects/` to `900_Archive/Projects/`. It updates the project index to
-`status: archived`; use `--yes` for non-interactive use.
+Initialization preserves existing files. To skip installing the companion
+plugin, use `--no-plugin`. To preview initialization, use `--dry-run`.
 
-`init` also installs the ARC Obsidian companion plugin by default into
-`.obsidian/plugins/arc-obsidian-plugin/`. Use `--no-plugin` to skip it. Existing
-plugin files are preserved unless the installed ARC plugin version differs from
-the CLI bundle; in that case, `init` asks before updating and backs up replaced
-files under `.arc-backups/`. Declining preserves the installed plugin. Obsidian
-still requires enabling the plugin in its settings.
+## More commands
 
-`links suggest` reports up to 20 local lexical matches among direct Markdown
-notes in `300_Slipbox/`. It requires an explicit vault path, uses no model or
-network service, and never modifies notes. Review suggestions manually; the
-ranking is heuristic, not evidence that two notes are related.
-Add `--output ../suggestions.md` to save a deterministic Markdown copy outside
-the vault; the destination must be new, and the normal stdout report remains.
+| Command                                                        | What it does                                                            |
+| -------------------------------------------------------------- | ----------------------------------------------------------------------- |
+| `arc update [path]`                                            | Preview and safely update scaffold files. Replaced files are backed up. |
+| `arc archive <project-name> [path]`                            | Move a completed project into the archive after confirmation.           |
+| `arc links suggest <vault-path>`                               | Suggest related Slipbox notes locally; does not edit notes.             |
+| `arc publish <vault-path> <selection...> --output <directory>` | Export selected Markdown notes to a new local review directory.         |
+| `arc hook install <vault-path> --repo <path>`                  | Optionally run ARC health checks before commits.                        |
+| `arc mcp <vault-path>`                                         | Start an opt-in, read-only MCP server for a selected vault.             |
 
-`publish` exports explicitly selected Markdown files or directories to a new
-local output directory. It previews the exact notes, excludes hidden content,
-Obsidian settings, templates, archives, and `Past_Phases_Archive` directories,
-and accepts additional vault-relative `--exclude` paths. It removes all YAML
-frontmatter, rejects notes marked private/sensitive or with ambiguous privacy
-metadata, and never writes inside the source vault. Use `--dry-run` to preview
-without prompting or `--yes` to accept the preview non-interactively; otherwise
-the command asks before writing. Review exported note bodies before sharing:
-the command does not detect sensitive prose, upload files, or publish remotely.
+Commands that change files preview their proposed changes and ask for
+confirmation by default. Read each command's guide for its flags, scope, and
+safety limits. In particular, `publish` removes YAML frontmatter and checks
+privacy metadata, but does not detect sensitive prose or upload files. Review
+exported content before sharing.
 
 ## Documentation
 
-| Guide                                                               | Description                                                                  |
-| ------------------------------------------------------------------- | ---------------------------------------------------------------------------- |
-| [Contributing](CONTRIBUTING.md)                                     | Development setup, contribution workflow, and pull request guidance.         |
-| [Code of Conduct](CODE_OF_CONDUCT.md)                               | Community participation expectations.                                        |
-| [Security](SECURITY.md)                                             | How to report security vulnerabilities privately.                            |
-| [Getting started](docs/getting-started.md)                          | Requirements, install and usage examples, CLI behavior, troubleshooting.     |
-| [ARC methodology](docs/methodology.md)                              | ACCESS, Zettelkasten, and iterative project execution.                       |
-| [Vault architecture](docs/architecture.md)                          | ARC layers, information flow, metadata contract, and design principles.      |
-| [Vault structure](docs/vault-structure.md)                          | Folder roles, scaffold tree, required baseline, and verification behavior.   |
-| [Vault workflows](docs/vault-workflows.md)                          | Practical capture, project, journal, review, and customization workflows.    |
-| [Templates and metadata](docs/templates-and-metadata.md)            | Generated notes, frontmatter fields, status values, and Dataview queries.    |
-| [Obsidian setup](docs/obsidian-setup.md)                            | Dataview, Templater, Graph View, and AI/filesystem access limitations.       |
-| [ARC Obsidian plugin](docs/obsidian-plugin.md)                      | Automatic installation, manual builds, and supported features.               |
-| [ARC MCP server](docs/mcp-server.md)                                | Optional local MCP launch, tools, content scope, limits, and security notes. |
-| [Development](docs/development.md)                                  | Architecture, scripts, tests, build, and CI.                                 |
-| [Releasing](docs/releasing.md)                                      | Manual npm package release checklist.                                        |
-| [Roadmap](docs/roadmap.md)                                          | Current ecosystem capabilities and exploratory directions.                   |
-| [Plan index](docs/plans/README.md)                                  | Plan naming convention and project plan documents.                           |
-| [Project foundation plan](docs/plans/00.arc-cli-foundation.plan.md) | Original CLI scope and architecture specification.                           |
+### Using ARC
+
+- [Getting started](docs/getting-started.md): installation, commands, and behavior.
+- [ARC methodology](docs/methodology.md): the ideas behind the ARC approach.
+- [Vault architecture](docs/architecture.md): layers, information flow, and metadata.
+- [Vault structure](docs/vault-structure.md): folders and verification requirements.
+- [Vault workflows](docs/vault-workflows.md): capture, projects, journals, and reviews.
+- [Templates and metadata](docs/templates-and-metadata.md): generated notes and fields.
+
+### Obsidian setup
+
+- [Obsidian setup](docs/obsidian-setup.md): Dataview, Templater, and Graph View.
+- [ARC Obsidian plugin](docs/obsidian-plugin.md): companion features and installation.
+
+### Contributing and project information
+
+- [Contributing](CONTRIBUTING.md): development setup and pull request guidance.
+- [Development](docs/development.md): architecture, scripts, tests, and CI.
+- [Security](SECURITY.md): reporting a vulnerability.
+- [Code of Conduct](CODE_OF_CONDUCT.md): community participation expectations.
+- [Releasing](docs/releasing.md): manual npm release guide.
+- [Roadmap](docs/roadmap.md): current capabilities and exploratory directions.
+- [Plan index](docs/plans/README.md): project plan documents.
 
 ## Project status
 
-The CLI provides `init`, `verify`, report-only `health`, confirmed `update`,
-safe project `archive`, explicit opt-in Git hook commands, an opt-in read-only
-MCP server, local Slipbox link suggestions, and local export of explicitly
-selected Markdown content. The ARC Obsidian companion is installed by `init`
-by default and can be skipped with `--no-plugin`; remote publishing and
-synchronization remain out of scope.
+ARC provides local vault setup and maintenance, optional Git and MCP
+integrations, Slipbox link suggestions, and selected-content export. The
+companion plugin is installed by `init` by default. Remote publishing and
+synchronization are out of scope.
 
 ## License
 
