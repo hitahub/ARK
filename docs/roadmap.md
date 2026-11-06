@@ -1,8 +1,9 @@
 # Roadmap (exploratory)
 
-The CLI currently supports `init`, `verify`, `health`, `update`, and `archive`. Roadmap items
-below distinguish available repository capabilities from future ideas. Each
-future direction needs feasibility, security, and requirements review before
+The CLI currently supports `init`, `verify`, `health`, `update`, `archive`,
+`mcp`, `links suggest`, `publish`, and `hook install|uninstall`. Sections below
+distinguish available repository capabilities from future ideas. Each future
+direction needs feasibility, security, and requirements review before
 implementation commitments are made.
 
 ## 1. ARC Obsidian plugin

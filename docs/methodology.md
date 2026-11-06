@@ -22,7 +22,9 @@ The no-subfolder rule is intended to keep concepts easy to discover and connect.
 
 The `200_Projects/` folder holds initiatives with a desired outcome and a finite scope. Each project can be divided into active phases or sprints. Completed work can be moved to an archive so it is distinct from current execution.
 
-ARC CLI scaffolds an example project layout, but it does not manage project lifecycle, move completed projects, or automatically update project status.
+ARC CLI scaffolds an example project layout and can archive a completed project
+with `arc archive`, moving it to `900_Archive/Projects/` and updating its index
+status. It does not automate phase management or rewrite project links.
 
 ## Layers work together
 
