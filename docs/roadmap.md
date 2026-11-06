@@ -1,75 +1,48 @@
-# Roadmap (exploratory)
+# Roadmap
 
-The CLI currently supports `init`, `verify`, `health`, `update`, and `archive`. Roadmap items
-below distinguish available repository capabilities from future ideas. Each
-future direction needs feasibility, security, and requirements review before
-implementation commitments are made.
+This page summarizes what the repository currently implements and which
+directions are still deferred. It is a status overview, not a delivery
+schedule, prioritization, or commitment. For command details, safety rules, and
+limitations, follow the linked user guides; the implementation and tests are
+the source of truth.
 
-## 1. ARC Obsidian plugin
+## Implemented capabilities
 
-An in-repository companion plugin is available under
-`src/obsidian-plugin/`. `pnpm build` produces its files alongside the CLI, and
-`arc init` installs them into the vault by default (or skips them with
-`--no-plugin`). See the [plugin guide](obsidian-plugin.md) for details. It
-provides a read-only Slipbox structure warning, explicit ARC note creation, and
-unresolved-wikilink diagnostics for the active note.
+| Area                         | Current status                                                                                                                                                                                        | User-facing reference                                                                                                  |
+| ---------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ---------------------------------------------------------------------------------------------------------------------- |
+| CLI scaffold and maintenance | `init`, `verify`, `health`, and `update` create, check, report on, and update a vault baseline.                                                                                                       | [Getting started](getting-started.md)                                                                                  |
+| Obsidian companion           | Built with the CLI and installed by `arc init` by default. Includes read-only Slipbox structure diagnostics, explicit ARC note creation, and active-note unresolved-wikilink diagnostics.             | [Plugin guide](obsidian-plugin.md)                                                                                     |
+| MCP integration              | Optional stdio server with read-only `get_active_projects`, `search_slipbox_by_tag`, and `get_note` tools for an explicitly selected vault.                                                           | [MCP guide](mcp-server.md)                                                                                             |
+| Health and Git hooks         | Report-only health checks find structural issues, broken local links, and likely orphan notes. Explicit hook commands can run the same checks before commits.                                         | [Health behavior](getting-started.md#health-behavior), [Git hook integration](getting-started.md#git-hook-integration) |
+| Link suggestions             | Bounded local lexical suggestions are the default; optional semantic matching uses a local Ollama model. Suggestions are reviewable and never applied automatically. Reports can be saved explicitly. | [Link suggestion behavior](getting-started.md#links-suggest-behavior)                                                  |
+| Project lifecycle            | `arc archive` moves a completed project to the archive after preview and confirmation, with collision checks and rollback handling.                                                                   | [Archive behavior](getting-started.md#archive-behavior)                                                                |
+| Selected-content export      | `arc publish` previews explicitly selected Markdown and exports to a new local review directory, applying documented exclusions and metadata handling.                                                | [Publish behavior](getting-started.md#publish-behavior)                                                                |
 
-The plugin does not prevent or automatically repair filesystem changes, modify
-existing notes, or synchronize task context with AI clients. AI-client sync
-remains deferred until transport, consent, authentication, and lifecycle
-requirements are defined. The repository package is not yet published through
-the Obsidian community plugin directory.
+## Deferred or exploratory directions
 
-## 2. ARC-aware MCP server
+These are areas that may be considered later. None has a delivery date or
+implementation commitment; each needs requirements and feasibility review
+before work is scoped.
 
-The optional, read-only `arc mcp <vault-path>` server exposes
-`get_active_projects`, `search_slipbox_by_tag`, and `get_note` over MCP stdio.
-It limits access to project index notes and direct Slipbox notes in the
-explicitly selected vault. See the [MCP server guide](mcp-server.md) for its
-contract and filesystem limitations.
+| Direction                            | Current boundary                                                                                                                | What needs to be decided before implementation                                                              |
+| ------------------------------------ | ------------------------------------------------------------------------------------------------------------------------------- | ----------------------------------------------------------------------------------------------------------- |
+| Obsidian community plugin listing    | Plugin build assets are produced in-repository, but the plugin has not been submitted to the Obsidian community directory.      | Submission ownership, release process, support expectations, and compatibility policy.                      |
+| AI-client synchronization            | The plugin does not synchronize task context or vault content with AI clients.                                                  | Transport, user consent, authentication, data scope, lifecycle, and privacy requirements.                   |
+| Write-capable MCP tools              | The MCP server is read-only; tools such as task creation are not implemented.                                                   | Allowed write scope, confirmation model, conflict handling, validation, and recovery behavior.              |
+| Broader Markdown compatibility       | Health checks intentionally implement bounded local-link and structure heuristics, not a complete Markdown parser or validator. | Required syntax compatibility, parser choice, performance bounds, and expected false-positive behavior.     |
+| Link-suggestion caching              | Suggestions are computed per invocation; caching is not part of the current contract.                                           | Invalidation, storage location, privacy implications, and whether performance benefits justify added state. |
+| Remote publishing or synchronization | `arc publish` writes only to a new local review directory; it does not upload or sync content.                                  | Target services, credentials, consent, privacy review, conflict behavior, and rollback expectations.        |
 
-Write-capable tools such as `create_task()` remain exploratory and require a
-separate scope decision. Structured output does not inherently prevent
-hallucinations or provide a security boundary.
+## Explicit limitations
 
-## 3. Vault health checks and Git integration
+- Local Git hooks are optional and can be bypassed; they are not a CI check,
+  authorization mechanism, or security guarantee.
+- Folder conventions, ignore files, structured outputs, and local integrations
+  are not security boundaries. ARC runs with the invoking user's filesystem
+  permissions.
+- Link suggestions and orphan detection are heuristics. They do not determine
+  whether knowledge is correct or conceptually related.
+- Local export's metadata checks do not detect sensitive prose. Review exported
+  files before sharing them.
 
-The report-only `arc health` command now checks broken local Markdown/wikilinks,
-orphan notes in ARC content layers, and structural baseline findings. The
-explicit `arc hook install|uninstall` commands optionally run those same checks
-before commits; they preview changes, reject occupied or custom hook locations,
-and never install hooks silently. Future work could improve Markdown
-compatibility. Local hooks are not a CI or security guarantee.
-
-## 4. Slipbox link suggestions
-
-`arc links suggest <vault-path>` reports bounded, deterministic lexical
-matches among direct Markdown notes in `300_Slipbox/`. It is offline and
-read-only; users review and apply any links themselves. Optional semantic
-matching is available with an installed local Ollama model and explicit
-`--semantic --model <name>` flags; the default remains lexical. Caching remains
-exploratory. The optional `--output` report feature is implemented; see the
-[saved link-suggestion reports plan](plans/09.saving-link-suggestion-reports.plan.md).
-A limited synthetic evaluation and implementation details are recorded in the
-[semantic matching evaluation](plans/10.evaluating-semantic-link-matching.plan.md).
-See [Getting started](getting-started.md#links-suggest-behavior) for its
-limits.
-
-## 5. Project lifecycle automation
-
-The `arc archive <project-name> [path]` command moves a project marked
-`status: done` from `200_Projects/` to `900_Archive/Projects/` and updates its
-index to `status: archived`. It previews and confirms by default, supports
-`--dry-run` and `--yes`, rejects collisions and unsafe project entries, and
-attempts rollback if the metadata update fails. User-authored path-qualified
-links are not rewritten; review them after moving. See
-[Getting started](getting-started.md#archive-behavior) for its safety contract.
-
-## 6. Publishing selected content
-
-`arc publish <vault-path> <selection...> --output <directory>` previews and
-exports explicitly selected Markdown files or directories to a new local
-review directory. It supports repeatable exclusions, omits protected ARC
-folders, removes YAML front-matter, and rejects private or ambiguous privacy
-metadata. Remote publication and synchronization remain out of scope. See
-[Getting started](getting-started.md#publish-behavior) for its safety contract.
+For preserved rationale and earlier proposals, see the [project plan index](plans/README.md).

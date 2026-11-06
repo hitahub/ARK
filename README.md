@@ -7,14 +7,14 @@ existing notes.
 
 ## Quick start
 
-The npm package is `@hitahub/arc`; its command is `arc`. The registry commands
+The package is `@hitahub/arc`; its command is `arc`. The registry commands
 below require the package to be published and available from your configured
 registry. To run ARC from a local checkout, see [Getting started](docs/getting-started.md#run-from-a-checkout).
 
 ```bash
-npx @hitahub/arc init ./MyVault
-npx @hitahub/arc verify ./MyVault
-npx @hitahub/arc health ./MyVault
+pnpm dlx @hitahub/arc init ./MyVault
+pnpm dlx @hitahub/arc verify ./MyVault
+pnpm dlx @hitahub/arc health ./MyVault
 ```
 
 `init` creates the vault structure, dashboards, and starter templates. It also
@@ -48,36 +48,19 @@ exported content before sharing.
 
 ## Documentation
 
-### Using ARC
-
+- [Documentation index](docs/README.md): guides organized by user and contributor tasks.
 - [Getting started](docs/getting-started.md): installation, commands, and behavior.
-- [ARC methodology](docs/methodology.md): the ideas behind the ARC approach.
-- [Vault architecture](docs/architecture.md): layers, information flow, and metadata.
-- [Vault structure](docs/vault-structure.md): folders and verification requirements.
-- [Vault workflows](docs/vault-workflows.md): capture, projects, journals, and reviews.
-- [Templates and metadata](docs/templates-and-metadata.md): generated notes and fields.
-
-### Obsidian setup
-
-- [Obsidian setup](docs/obsidian-setup.md): Dataview, Templater, and Graph View.
-- [ARC Obsidian plugin](docs/obsidian-plugin.md): companion features and installation.
-
-### Contributing and project information
-
-- [Contributing](CONTRIBUTING.md): development setup and pull request guidance.
-- [Development](docs/development.md): architecture, scripts, tests, and CI.
+- [Roadmap](docs/roadmap.md): implemented capabilities and deferred directions.
+- [Contributing](CONTRIBUTING.md): development setup and contribution guidance.
 - [Security](SECURITY.md): reporting a vulnerability.
 - [Code of Conduct](CODE_OF_CONDUCT.md): community participation expectations.
-- [Releasing](docs/releasing.md): manual npm release guide.
-- [Roadmap](docs/roadmap.md): current capabilities and exploratory directions.
-- [Plan index](docs/plans/README.md): project plan documents.
 
 ## Project status
 
 ARC provides local vault setup and maintenance, optional Git and MCP
 integrations, Slipbox link suggestions, and selected-content export. The
-companion plugin is installed by `init` by default. Remote publishing and
-synchronization are out of scope.
+companion plugin is installed by `init` by default. See the [roadmap](docs/roadmap.md)
+for the status and boundaries of current features and deferred directions.
 
 ## License
 

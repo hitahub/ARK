@@ -79,6 +79,7 @@ When changing it:
 - Check that commands, paths, and relative Markdown links are accurate.
 
 For an overview of the codebase and implementation flows, see [`docs/development.md`](docs/development.md). For CLI and vault behavior, see [`docs/getting-started.md`](docs/getting-started.md) and [`docs/vault-structure.md`](docs/vault-structure.md).
+For the complete guide map, see the [documentation index](docs/README.md).
 
 ## Validate your work
 
@@ -118,4 +119,6 @@ shared history unless repository maintainers explicitly request it.
 
 Documentation-only changes do not require a production build, but run `pnpm format:check` and verify any changed relative Markdown links. Code changes should pass the full validation commands above.
 
-Contributors should not publish npm releases as part of ordinary pull requests. Release versioning and publication should be coordinated with the maintainers.
+Contributors should not publish package releases as part of ordinary pull
+requests. Release versioning and publication should be coordinated with the
+maintainers.
