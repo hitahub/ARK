@@ -7,14 +7,14 @@ existing notes.
 
 ## Quick start
 
-The npm package is `@hitahub/arc`; its command is `arc`. The registry commands
+The package is `@hitahub/arc`; its command is `arc`. The registry commands
 below require the package to be published and available from your configured
 registry. To run ARC from a local checkout, see [Getting started](docs/getting-started.md#run-from-a-checkout).
 
 ```bash
-npx @hitahub/arc init ./MyVault
-npx @hitahub/arc verify ./MyVault
-npx @hitahub/arc health ./MyVault
+pnpm dlx @hitahub/arc init ./MyVault
+pnpm dlx @hitahub/arc verify ./MyVault
+pnpm dlx @hitahub/arc health ./MyVault
 ```
 
 `init` creates the vault structure, dashboards, and starter templates. It also
@@ -40,11 +40,13 @@ plugin, use `--no-plugin`. To preview initialization, use `--dry-run`.
 | `arc hook install <vault-path> --repo <path>`                  | Optionally run ARC health checks before commits.                        |
 | `arc mcp <vault-path>`                                         | Start an opt-in, read-only MCP server for a selected vault.             |
 
-Commands that change files preview their proposed changes and ask for
-confirmation by default. Read each command's guide for its flags, scope, and
-safety limits. In particular, `publish` removes YAML front-matter and checks
-privacy metadata, but does not detect sensitive prose or upload files. Review
-exported content before sharing.
+Commands that replace, move, or export existing content preview their proposed
+changes and ask for confirmation by default. `init` with an explicit path
+creates missing scaffold files without prompting; use `--dry-run` to preview.
+Read each command's guide for its flags, scope, and safety limits. In
+particular, `publish` removes YAML front-matter and checks privacy metadata,
+but does not detect sensitive prose or upload files. Review exported content
+before sharing.
 
 ## Documentation
 
@@ -68,7 +70,7 @@ exported content before sharing.
 - [Development](docs/development.md): architecture, scripts, tests, and CI.
 - [Security](SECURITY.md): reporting a vulnerability.
 - [Code of Conduct](CODE_OF_CONDUCT.md): community participation expectations.
-- [Releasing](docs/releasing.md): manual npm release guide.
+- [Releasing](docs/releasing.md): manual package release guide.
 - [Roadmap](docs/roadmap.md): current capabilities and exploratory directions.
 - [Plan index](docs/plans/README.md): project plan documents.
 

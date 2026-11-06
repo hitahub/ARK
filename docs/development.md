@@ -31,7 +31,7 @@ NodeNext resolution. `tsup` bundles `src/cli/index.ts` for Node.js 20 into
 `dist/cli/index.js`, which the executable wrapper loads. `pnpm build` also
 builds the plugin as CommonJS with Obsidian externalized; its manifest, bundle,
 and stylesheet are written to `dist/obsidian-plugin/`. These files are included
-in the npm package and copied by `arc init` into the vault unless `--no-plugin`
+in the published package and copied by `arc init` into the vault unless `--no-plugin`
 is specified.
 
 ### Initialization flow
@@ -120,9 +120,15 @@ Run all tests with `pnpm test`.
 
 ## Build and package
 
-`npm pack --dry-run` runs the `prepack` build and reports the package contents without publishing. `package.json` includes `bin/`, `dist/`, `docs/`, `README.md`, `CONTRIBUTING.md`, and `CODE_OF_CONDUCT.md`; npm also includes the package license file. The CLI binary name is `arc` and the npm package name is `@hitahub/arc`.
+`pnpm pack --dry-run` runs the `prepack` build and reports the package contents
+without publishing. `package.json` includes `bin/`, `dist/`, `docs/`,
+`README.md`, `CONTRIBUTING.md`, and `CODE_OF_CONDUCT.md`; the package manager
+also includes the package license file. The CLI binary name is `arc` and the
+package name is `@hitahub/arc`.
 
-To publish, first confirm npm organization permissions, registry configuration, and the intended release version. Publication is not performed by the build or pack commands. See the [manual npm release guide](releasing.md).
+To publish, first confirm organization permissions, registry configuration, and
+the intended release version. Publication is not performed by the build or
+pack commands. See the [manual release guide](releasing.md).
 
 ## Continuous integration
 
