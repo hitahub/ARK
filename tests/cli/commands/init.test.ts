@@ -335,10 +335,51 @@ describe('initializeVault', () => {
         now: () => new Date(2032, 0, 1),
         pluginAssetsDirectory,
       }),
-    ).rejects.toThrow('Cannot install ARC plugin through symlink');
+    ).rejects.toThrow('Cannot create scaffold path through symlink');
 
     expect(await fs.pathExists(path.join(outside, 'plugins'))).toBe(false);
     expect(await fs.pathExists(path.join(target, '000_Atlas'))).toBe(false);
+  });
+
+  it('refuses to create regular scaffold files through a symlinked directory', async () => {
+    const parent = await createTemporaryDirectory();
+    const target = path.join(parent, 'vault');
+    const outside = path.join(parent, 'outside');
+    await fs.ensureDir(target);
+    await fs.ensureDir(outside);
+    await fs.symlink(outside, path.join(target, '000_Atlas'), 'dir');
+
+    await expect(
+      initializeVault('./vault', {
+        cwd: parent,
+        now: () => new Date(2032, 0, 1),
+        installPlugin: false,
+      }),
+    ).rejects.toThrow('Cannot create scaffold path through symlink');
+
+    expect(await fs.pathExists(path.join(outside, 'Dashboard.md'))).toBe(false);
+    expect(await fs.pathExists(path.join(target, '200_Projects'))).toBe(false);
+  });
+
+  it('reports symlinked scaffold directories during dry-run without writing outside the vault', async () => {
+    const parent = await createTemporaryDirectory();
+    const target = path.join(parent, 'vault');
+    const outside = path.join(parent, 'outside');
+    await fs.ensureDir(target);
+    await fs.ensureDir(outside);
+    await fs.symlink(outside, path.join(target, '000_Atlas'), 'dir');
+
+    await expect(
+      initializeVault('./vault', {
+        cwd: parent,
+        dryRun: true,
+        now: () => new Date(2032, 0, 1),
+        installPlugin: false,
+      }),
+    ).rejects.toThrow('Cannot create scaffold path through symlink');
+
+    expect(await fs.pathExists(path.join(outside, 'Dashboard.md'))).toBe(false);
+    expect(await fs.pathExists(path.join(target, '200_Projects'))).toBe(false);
   });
 
   it('rolls back plugin and scaffold files if plugin installation fails', async () => {

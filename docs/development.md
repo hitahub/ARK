@@ -44,7 +44,7 @@ is specified.
 6. Write the registered scaffold and plugin files, preserving existing files unless an ARC plugin version update was accepted.
 7. Report created, updated, and preserved files.
 
-Writes use exclusive-create semantics to prevent replacing pre-existing content, including during concurrent initialization attempts. Plugin installation rejects symlinked parent paths to avoid writing outside the vault. On failure, initialization removes only files it created that still contain the generated content, then removes only empty directories it created. Rollback failures are surfaced alongside the original error. `--dry-run` previews planned file changes without writing.
+Writes use exclusive-create semantics to prevent replacing pre-existing content, including during concurrent initialization attempts. Initialization rejects symlinked scaffold directories and file parents to avoid writing outside the vault. On failure, initialization removes only files it created that still contain the generated content, then removes only empty directories it created. Rollback failures are surfaced alongside the original error. `--dry-run` previews planned file changes without writing and rejects symlinked scaffold paths.
 
 The plugin build derives its manifest version from the root `package.json`, which is the release version source for both CLI and plugin artifacts. Community Plugin submission remains a separate, deferred release decision.
 
