@@ -195,7 +195,7 @@ export function createProgram(dependencies: CliDependencies = {}): Command {
   program
     .command('archive')
     .description('Move a completed project into archive storage')
-    .argument('<project-name>', 'project folder name under 200_Projects')
+    .argument('<project-name>', 'project folder name under 200_Projects (the project note title)')
     .argument('[path]', 'vault directory', process.cwd())
     .option('--yes', 'archive without prompting')
     .option('--dry-run', 'preview the archive without moving files')

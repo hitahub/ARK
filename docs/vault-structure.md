@@ -63,6 +63,9 @@ be enabled in Obsidian's settings.
 | `999_Templates/`                              | Markdown template sources for Templater. The CLI creates them but does not install, configure, or invoke Templater.                                                                                                      |
 | `.claudeignore`                               | Best-effort exclusion hints for Claude clients that honor this file. It is not a security or access-control boundary.                                                                                                    |
 
+The Obsidian plugin creates each project as a folder containing `Project.md`,
+which is compatible with `arc archive`.
+
 ### Number prefixes
 
 The numeric prefixes are a navigation convention, not a permission model or

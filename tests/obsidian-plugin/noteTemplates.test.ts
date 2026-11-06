@@ -2,6 +2,7 @@ import { describe, expect, it } from 'vitest';
 import {
   createNoteContent,
   getAvailableNotePath,
+  getAvailableProjectNotePath,
   getNoteFolder,
   sanitizeNoteTitle,
 } from '../../src/obsidian-plugin/noteTemplates.js';
@@ -40,6 +41,14 @@ describe('ARC note templates', () => {
 
     expect(getAvailableNotePath('200_Projects', 'Plan', (path) => existing.has(path))).toBe(
       '200_Projects/Plan 3.md',
+    );
+  });
+
+  it('places project index notes in uniquely named project folders', () => {
+    const existing = new Set(['200_Projects/Plan', '200_Projects/Plan.md', '200_Projects/Plan 2']);
+
+    expect(getAvailableProjectNotePath('200_Projects', 'Plan', (path) => existing.has(path))).toBe(
+      '200_Projects/Plan 3/Project.md',
     );
   });
 });
