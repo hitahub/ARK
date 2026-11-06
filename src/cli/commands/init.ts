@@ -216,18 +216,25 @@ export async function initializeVault(
   }
   if (options.dryRun) {
     for (const directory of plannedDirectories) {
-      const stats = await fs.stat(directory).catch((error: unknown) => {
-        if (isMissingError(error)) return undefined;
-        throw error;
-      });
+      if (directory !== target) {
+        await assertNoSymlinkParents(
+          target,
+          path.relative(target, directory).split(path.sep).join('/'),
+          true,
+        );
+      }
+      const stats = await (directory === target ? fs.stat(directory) : fs.lstat(directory)).catch(
+        (error: unknown) => {
+          if (isMissingError(error)) return undefined;
+          throw error;
+        },
+      );
       if (stats && !stats.isDirectory()) {
         throw new Error(`Not a directory: ${directory}`);
       }
     }
     for (const relativePath of Object.keys(filesToWrite)) {
-      if (relativePath.startsWith(`${pluginDirectory}/`)) {
-        await assertNoSymlinkParents(target, relativePath);
-      }
+      await assertNoSymlinkParents(target, relativePath);
       const absolutePath = path.join(target, relativePath);
       const stats = await fs.lstat(absolutePath).catch((error: unknown) => {
         if (isMissingError(error)) return undefined;
@@ -259,10 +266,18 @@ export async function initializeVault(
   }> = [];
   try {
     for (const directory of plannedDirectories) {
+      if (directory !== target) {
+        await assertNoSymlinkParents(
+          target,
+          path.relative(target, directory).split(path.sep).join('/'),
+          true,
+        );
+      }
       await ensureDirectoryTracked(directory, createdDirectories);
     }
 
     for (const [relativePath, contents] of Object.entries(filesToWrite)) {
+      await assertNoSymlinkParents(target, relativePath);
       const pluginUpdate = pluginUpdates.get(relativePath);
       if (pluginUpdate) {
         const absolutePath = path.join(target, relativePath);
@@ -416,8 +431,14 @@ async function resolvePluginAssetsDirectory(): Promise<string> {
   return path.resolve(path.dirname(realEntrypoint), '..', 'dist/obsidian-plugin');
 }
 
-async function assertNoSymlinkParents(root: string, relativePath: string): Promise<void> {
-  const parentParts = path.posix.dirname(relativePath).split('/');
+async function assertNoSymlinkParents(
+  root: string,
+  relativePath: string,
+  includeTarget = false,
+): Promise<void> {
+  const parentParts = (includeTarget ? relativePath : path.posix.dirname(relativePath))
+    .split('/')
+    .filter((part) => part && part !== '.');
   let currentPath = root;
   for (const part of parentParts) {
     currentPath = path.join(currentPath, part);
@@ -427,10 +448,10 @@ async function assertNoSymlinkParents(root: string, relativePath: string): Promi
     });
     if (!stats) return;
     if (stats.isSymbolicLink()) {
-      throw new Error(`Cannot install ARC plugin through symlink: ${currentPath}`);
+      throw new Error(`Cannot create scaffold path through symlink: ${currentPath}`);
     }
     if (!stats.isDirectory()) {
-      throw new Error(`Cannot install ARC plugin; path is not a directory: ${currentPath}`);
+      throw new Error(`Cannot create scaffold path; parent is not a directory: ${currentPath}`);
     }
   }
 }
