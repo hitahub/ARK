@@ -55,7 +55,8 @@ Verification checks the required directory/file baseline and checks direct entri
 `health` adds a best-effort local-link scan and inbound-link heuristic for notes in ARC content layers; it also reports `verify` findings. It is read-only and intentionally does not parse Markdown syntax or validate headings and metadata. `update` previews all scaffold additions and replacements, requires confirmation unless `--yes` is supplied, backs up replaced files under `.arc-backups/`, and leaves unchanged files and symlinks alone.
 `archive` moves a project marked `status: done` into `900_Archive/Projects/`,
 changes its index status to `archived`, rejects collisions and unsafe entries,
-and rolls the move back if updating metadata fails.
+and rolls the move back if updating metadata fails. The Obsidian plugin creates
+projects as folders containing `Project.md` so they can be archived directly.
 `hook install` and `hook uninstall` explicitly manage an ARC-owned pre-commit
 hook. The hook invokes the existing report-only health command for a resolved
 vault path and never replaces an existing hook or custom `core.hooksPath`.

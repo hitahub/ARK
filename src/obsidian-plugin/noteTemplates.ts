@@ -28,6 +28,24 @@ export function getAvailableNotePath(
   return path;
 }
 
+export function getAvailableProjectNotePath(
+  folder: string,
+  title: string,
+  pathExists: (path: string) => boolean,
+): string {
+  let projectPath = `${folder}/${title}`;
+  let suffix = 2;
+  while (
+    pathExists(projectPath) ||
+    pathExists(`${projectPath}.md`) ||
+    pathExists(`${projectPath}/Project.md`)
+  ) {
+    projectPath = `${folder}/${title} ${suffix}`;
+    suffix += 1;
+  }
+  return `${projectPath}/Project.md`;
+}
+
 export function createNoteContent(
   title: string,
   type: ArcNoteType,

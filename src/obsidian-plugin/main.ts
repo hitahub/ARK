@@ -13,6 +13,7 @@ import {
 import {
   createNoteContent,
   getAvailableNotePath,
+  getAvailableProjectNotePath,
   getNoteFolder,
   sanitizeNoteTitle,
   type ArcNoteType,
@@ -211,9 +212,16 @@ export default class ArcObsidianPlugin extends Plugin {
       }
       if (!folderFile) await this.app.vault.createFolder(folder);
 
-      const path = getAvailableNotePath(folder, title, (candidate) =>
-        Boolean(this.app.vault.getAbstractFileByPath(candidate)),
-      );
+      const pathExists = (candidate: string) =>
+        Boolean(this.app.vault.getAbstractFileByPath(candidate));
+      const path =
+        type === 'project'
+          ? getAvailableProjectNotePath(folder, title, pathExists)
+          : getAvailableNotePath(folder, title, pathExists);
+      const noteFolder = path.slice(0, path.lastIndexOf('/'));
+      if (type === 'project' && !this.app.vault.getAbstractFileByPath(noteFolder)) {
+        await this.app.vault.createFolder(noteFolder);
+      }
       await this.app.vault.create(path, createNoteContent(title, type));
       new Notice(`Created ${type} note: ${path}`);
       return true;
